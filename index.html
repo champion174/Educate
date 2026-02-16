@@ -3,78 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NextStep: Comprehensive Career Guide</title>
+    <title>Career Pathfinder Pro</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    
     <style>
-        :root {
-            --primary: #2563eb;
-            --bg: #f0f2f5;
-            --card-bg: #ffffff;
-            --text: #1f2937;
-            --tag-study: #e0e7ff; --text-study: #3730a3;
-            --tag-job: #dcfce7; --text-job: #166534;
-            --tag-exam: #ffedd5; --text-exam: #9a3412;
-            --tag-schol: #f3e8ff; --text-schol: #6b21a8;
-        }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; }
+        :root { --primary: #0f172a; --accent: #3b82f6; --bg: #f8fafc; --card: #ffffff; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: #334155; margin: 0; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
         
         /* Header */
-        header { text-align: center; margin-bottom: 30px; }
-        h1 { color: #111827; margin-bottom: 5px; }
-        p { color: #6b7280; }
+        header { background: var(--primary); color: white; padding: 40px 20px; border-radius: 16px; margin-bottom: 30px; text-align: center; }
+        h1 { margin: 0; font-size: 2.5rem; }
+        p { opacity: 0.9; margin-top: 10px; font-size: 1.1rem; }
 
-        /* Controls */
-        .controls { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 25px; }
-        .flex-row { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; align-items: center; }
+        /* Control Panel */
+        .controls { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: flex; flex-wrap: wrap; gap: 20px; align-items: center; justify-content: space-between; margin-bottom: 30px; }
+        select { padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; font-weight: 600; min-width: 300px; }
         
-        select { padding: 10px 15px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 16px; min-width: 250px; }
+        /* Filter Chips */
+        .filters { display: flex; gap: 10px; flex-wrap: wrap; }
+        .filter-chip { padding: 8px 16px; border-radius: 20px; border: 1px solid #e2e8f0; background: white; cursor: pointer; font-weight: 500; transition: all 0.2s; font-size: 14px; }
+        .filter-chip:hover { background: #f1f5f9; }
+        .filter-chip.active { background: var(--primary); color: white; border-color: var(--primary); }
         
-        /* Filter Buttons */
-        .filters { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 15px; }
-        .filter-btn { border: 1px solid #e5e7eb; background: white; padding: 6px 16px; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; }
-        .filter-btn:hover { background: #f9fafb; }
-        .filter-btn.active { background: #1f2937; color: white; border-color: #1f2937; }
-
         /* View Toggle */
-        .view-toggle { margin-top: 15px; display: flex; justify-content: center; gap: 10px; }
-        .toggle-btn { background: none; border: none; cursor: pointer; color: #6b7280; font-weight: 600; padding-bottom: 5px; }
-        .toggle-btn.active { color: var(--primary); border-bottom: 2px solid var(--primary); }
+        .view-toggle { display: flex; background: #f1f5f9; padding: 4px; border-radius: 8px; }
+        .toggle-btn { border: none; background: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; color: #64748b; cursor: pointer; }
+        .toggle-btn.active { background: white; color: var(--primary); shadow: 0 1px 3px rgba(0,0,0,0.1); }
 
-        /* Grid */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; margin-top: 20px; }
+        /* Grid View */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; transition: transform 0.2s; position: relative; overflow: hidden; }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-color: var(--accent); }
         
-        /* Cards */
-        .card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #e5e7eb; display: flex; flex-direction: column; transition: transform 0.2s; }
-        .card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        /* Color Coding */
+        .card.Study { border-top: 5px solid #3b82f6; } /* Blue */
+        .card.Job { border-top: 5px solid #10b981; }   /* Green */
+        .card.Exam { border-top: 5px solid #f59e0b; }  /* Orange */
+        .card.Scholarship { border-top: 5px solid #8b5cf6; } /* Purple */
+
+        .card h3 { margin: 0 0 10px 0; color: #0f172a; }
+        .tag { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; color: #64748b; margin-bottom: 15px; display: block; }
+        .desc { font-size: 0.95rem; line-height: 1.6; color: #475569; margin-bottom: 20px; }
         
-        .card-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px; }
-        .card h3 { margin: 0; font-size: 18px; color: #111827; }
+        .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.85rem; background: #f8fafc; padding: 12px; border-radius: 8px; }
+        .meta-item strong { display: block; color: #0f172a; margin-bottom: 2px; }
+
+        /* Flowchart Container */
+        #flowchart-view { background: white; border-radius: 12px; padding: 40px; min-height: 500px; display: none; overflow: auto; text-align: center; }
         
-        .tag { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
-        .tag.Study { background: var(--tag-study); color: var(--text-study); }
-        .tag.Job { background: var(--tag-job); color: var(--text-job); }
-        .tag.Exam { background: var(--tag-exam); color: var(--text-exam); }
-        .tag.Scholarship { background: var(--tag-schol); color: var(--text-schol); }
-
-        .desc { font-size: 14px; color: #4b5563; margin-bottom: 15px; line-height: 1.5; flex-grow: 1; }
-
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #f9fafb; padding: 10px; border-radius: 8px; font-size: 13px; margin-bottom: 15px; }
-        .stat-item strong { display: block; color: #374151; margin-bottom: 2px; }
-
-        .actions { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 10px; border-top: 1px solid #f3f4f6; }
-        .btn-suggest { color: var(--primary); text-decoration: none; font-size: 13px; font-weight: 500; }
-
-        /* Tree View */
-        #tree-view { display: none; margin-top: 30px; text-align: center; overflow-x: auto; }
-        .tree-container { display: inline-flex; flex-direction: column; align-items: center; }
-        .tree-root { background: #1f2937; color: white; padding: 10px 20px; border-radius: 8px; margin-bottom: 30px; position: relative; font-weight: bold; }
-        .tree-root::after { content: ''; position: absolute; bottom: -20px; left: 50%; width: 2px; height: 20px; background: #cbd5e1; }
-        .tree-branches { display: flex; gap: 20px; justify-content: center; }
-        .branch { display: flex; flex-direction: column; align-items: center; position: relative; }
-        .branch::before { content: ''; position: absolute; top: -30px; left: 50%; width: 2px; height: 30px; background: #cbd5e1; }
-        /* Horizontal connector line logic would be complex here, using simplified vertical flow for mobile friendliness */
-        .tree-node { border: 1px solid #e2e8f0; background: white; padding: 10px; border-radius: 6px; width: 140px; text-align: center; font-size: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .tree-node:hover { border-color: var(--primary); cursor: pointer; }
+        /* Loading */
+        #loading { text-align: center; font-size: 1.2rem; color: #64748b; margin-top: 50px; }
 
     </style>
 </head>
@@ -82,88 +62,94 @@
 
 <div class="container">
     <header>
-        <h1>🚀 NextStep Career Explorer</h1>
-        <p>A community-verified database of courses, jobs, and scholarships.</p>
+        <h1>🎓 Career Pathfinder Pro</h1>
+        <p>Verified Database: Bachelor's, Master's, PhD, Fellowships (CSIR/GATE/NFOBC), and Abroad Options.</p>
     </header>
 
     <div class="controls">
-        <div class="flex-row">
-            <strong>I have completed:</strong>
-            <select id="stageSelect" onchange="refreshData()">
-                <option value="all">Select your stage...</option>
-            </select>
+        <div>
+            <label style="display:block; font-size:12px; font-weight:bold; color:#64748b; margin-bottom:5px;">CURRENT STAGE</label>
+            <select id="stageSelect" onchange="refreshData()"><option value="all">Loading...</option></select>
         </div>
 
         <div class="filters">
-            <button class="filter-btn active" onclick="setFilter('all')" id="btn-all">Show All</button>
-            <button class="filter-btn" onclick="setFilter('Study')" id="btn-Study">📚 Courses & Degrees</button>
-            <button class="filter-btn" onclick="setFilter('Job')" id="btn-Job">💼 Jobs</button>
-            <button class="filter-btn" onclick="setFilter('Exam')" id="btn-Exam">📝 Entrance Exams</button>
-            <button class="filter-btn" onclick="setFilter('Scholarship')" id="btn-Scholarship">🎓 Scholarships</button>
+            <div class="filter-chip active" onclick="setFilter('all', this)">All Options</div>
+            <div class="filter-chip" onclick="setFilter('Study', this)">🎓 Degrees (UG/PG/PhD)</div>
+            <div class="filter-chip" onclick="setFilter('Job', this)">💼 Jobs & PSUs</div>
+            <div class="filter-chip" onclick="setFilter('Exam', this)">📝 Exams (NET/GATE/GRE)</div>
+            <div class="filter-chip" onclick="setFilter('Scholarship', this)">💰 Fellowships (JRF/NFOBC)</div>
         </div>
 
         <div class="view-toggle">
-            <button class="toggle-btn active" onclick="setView('grid')" id="view-grid">Grid View</button>
-            <button class="toggle-btn" onclick="setView('tree')" id="view-tree">Tree / Flowchart</button>
+            <button class="toggle-btn active" onclick="setView('grid', this)">Grid View</button>
+            <button class="toggle-btn" onclick="setView('flowchart', this)">Flowchart View</button>
         </div>
     </div>
 
+    <div id="loading">Loading Database...</div>
     <div id="grid-view" class="grid"></div>
-    <div id="tree-view"></div>
+    <div id="flowchart-view" class="mermaid"></div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 <script>
-    // ------------------------------------------------------------------
-    //
+    // ---------------------------------------------------------
+    // 
     const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTS-7VnjzzDZDXXiSYTcpBQwov0_ErYcZHufwKgmDQf5-Bt1NK0qot1JvAbhigaHL6iots2aIM7cdI2/pub?output=csv';
-    // ------------------------------------------------------------------
-    const SUGGESTION_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLScU6o9NIG_NGQ_wSY_UINusomBDYHZVnBdB5RZYexYCaJt4Pg/viewform?usp=publish-editor';
+    // ---------------------------------------------------------
 
     let allData = [];
     let currentFilter = 'all';
     let currentView = 'grid';
 
+    mermaid.initialize({ startOnLoad: false, theme: 'neutral' });
+
     window.onload = function() {
         Papa.parse(SHEET_CSV_URL, {
-            download: true, header: true,
+            download: true, header: true, skipEmptyLines: true,
             complete: function(results) {
                 allData = results.data;
                 populateDropdown();
+                document.getElementById('loading').style.display = 'none';
             }
         });
     };
 
     function populateDropdown() {
-        const stages = [...new Set(allData.map(d => d.Current_Stage).filter(Boolean))];
         const select = document.getElementById('stageSelect');
+        const stages = [...new Set(allData.map(d => d.Current_Stage))].sort();
+        select.innerHTML = '<option value="all">Select your current qualification...</option>';
         stages.forEach(s => {
-            let opt = document.createElement('option');
-            opt.value = s; opt.innerText = s;
-            select.appendChild(opt);
+            if(s) select.innerHTML += `<option value="${s}">${s}</option>`;
         });
     }
 
-    function setFilter(f) {
-        currentFilter = f;
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('btn-' + f).classList.add('active');
+    function setFilter(filter, btn) {
+        currentFilter = filter;
+        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
         refreshData();
     }
 
-    function setView(v) {
-        currentView = v;
-        document.getElementById('view-grid').classList.toggle('active', v === 'grid');
-        document.getElementById('view-tree').classList.toggle('active', v === 'tree');
-        document.getElementById('grid-view').style.display = v === 'grid' ? 'grid' : 'none';
-        document.getElementById('tree-view').style.display = v === 'tree' ? 'block' : 'none';
+    function setView(view, btn) {
+        currentView = view;
+        document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('grid-view').style.display = view === 'grid' ? 'grid' : 'none';
+        document.getElementById('flowchart-view').style.display = view === 'flowchart' ? 'block' : 'none';
         refreshData();
     }
 
     function refreshData() {
         const stage = document.getElementById('stageSelect').value;
-        if(stage === 'all') return;
+        const container = document.getElementById('grid-view');
+        
+        if(stage === 'all') {
+            container.innerHTML = '<p style="text-align:center; width:100%">Please select a qualification stage above.</p>';
+            document.getElementById('flowchart-view').innerHTML = '';
+            return;
+        }
 
+        // Filter Data
         const filtered = allData.filter(item => {
             if (item.Current_Stage !== stage) return false;
             if (currentFilter === 'all') return true;
@@ -171,7 +157,7 @@
         });
 
         if (currentView === 'grid') renderGrid(filtered);
-        else renderTree(stage, filtered);
+        else renderFlowchart(stage, filtered);
     }
 
     function renderGrid(data) {
@@ -179,75 +165,63 @@
         container.innerHTML = '';
         
         if (data.length === 0) {
-            container.innerHTML = '<p style="text-align:center; width:100%; color:#666;">No results found for this filter.</p>'; 
-            return;
+            container.innerHTML = '<p>No results found for this category.</p>'; return;
         }
 
         data.forEach(item => {
-            // Logic to hide Duration/Fees for Jobs
+            // Logic: Hide Fees/Duration for Jobs
             const isJob = item.Category.includes('Job');
             const isSchol = item.Category.includes('Scholarship');
+            const isExam = item.Category.includes('Exam');
 
-            let statsHtml = '';
-            
-            // Duration: Hide for jobs
-            if (!isJob && item.Duration) {
-                statsHtml += `<div class="stat-item"><strong>⏳ Duration</strong>${item.Duration}</div>`;
-            }
-            
-            // Fees: Hide for jobs/scholarships
-            if (!isJob && !isSchol && item.Approx_Fees) {
-                statsHtml += `<div class="stat-item"><strong>💸 Approx Fees</strong>${item.Approx_Fees}</div>`;
-            }
+            let meta = '';
+            if(!isJob && !isExam && item.Duration) meta += `<div class="meta-item"><strong>⏳ Duration</strong>${item.Duration}</div>`;
+            if(!isJob && !isSchol && !isExam && item.Approx_Fees) meta += `<div class="meta-item"><strong>💸 Fees</strong>${item.Approx_Fees}</div>`;
+            if(item.Average_Salary) meta += `<div class="meta-item"><strong>💰 ${isSchol ? 'Stipend/Grant' : 'Expect. Salary'}</strong>${item.Average_Salary}</div>`;
+            if(item.Admission_Exam) meta += `<div class="meta-item"><strong>📝 Exam/Process</strong>${item.Admission_Exam}</div>`;
 
-            // Salary/Amount
-            if (item.Average_Salary) {
-                const label = isSchol ? '💰 Grant Amount' : '💰 Avg Salary';
-                statsHtml += `<div class="stat-item"><strong>${label}</strong>${item.Average_Salary}</div>`;
-            }
-
-            // Admission/Exam
-            if (item.Admission_Process) {
-                 statsHtml += `<div class="stat-item"><strong>📝 Admission</strong>${item.Admission_Process}</div>`;
-            }
-
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `
-                <div class="card-header">
+            container.innerHTML += `
+                <div class="card ${item.Category.split(' ')[0]}">
+                    <span class="tag">${item.Category}</span>
                     <h3>${item.Option_Name}</h3>
-                    <span class="tag ${item.Category.split(' ')[0]}">${item.Category}</span>
-                </div>
-                <div class="desc">${item.Description}</div>
-                <div class="stats-grid">${statsHtml}</div>
-                <div class="actions">
-                    <span style="font-size:12px; color:#888;">Diff: ${item.Difficulty_Level || 'N/A'}</span>
-                    <a href="${SUGGESTION_FORM_URL}" target="_blank" class="btn-suggest">Suggest Edit →</a>
+                    <div class="desc">${item.Description}</div>
+                    <div class="meta-grid">${meta}</div>
                 </div>
             `;
-            container.appendChild(card);
         });
     }
 
-    function renderTree(root, data) {
-        const container = document.getElementById('tree-view');
-        if(data.length === 0) { container.innerHTML = 'No data'; return; }
+    async function renderFlowchart(root, data) {
+        const container = document.getElementById('flowchart-view');
+        container.innerHTML = ''; // Clear previous
+        
+        if(data.length === 0) { container.innerHTML = 'No data to chart.'; return; }
 
-        let branchesHtml = data.map(item => `
-            <div class="branch">
-                <div class="tree-node" title="${item.Description}">
-                    <strong>${item.Option_Name}</strong><br>
-                    <span style="color:#666; font-size:10px;">${item.Category}</span>
-                </div>
-            </div>
-        `).join('');
+        // Generate Mermaid Syntax
+        let graph = `graph TD\n`;
+        graph += `ROOT[${root}]:::rootNode\n`;
+        
+        data.forEach((item, index) => {
+            // Sanitize ID (remove spaces/special chars)
+            let id = `node${index}`;
+            let label = item.Option_Name.replace(/["()]/g, '');
+            
+            // Color coding classes
+            let className = item.Category.split(' ')[0];
+            
+            graph += `ROOT --> ${id}["${label}"]:::${className}\n`;
+        });
 
-        container.innerHTML = `
-            <div class="tree-container">
-                <div class="tree-root">${root}</div>
-                <div class="tree-branches" style="flex-wrap:wrap; gap:10px;">${branchesHtml}</div>
-            </div>
-        `;
+        // Styles
+        graph += `classDef rootNode fill:#0f172a,color:#fff,stroke:#333,stroke-width:2px;\n`;
+        graph += `classDef Study fill:#dbeafe,stroke:#2563eb,color:#1e3a8a;\n`;
+        graph += `classDef Job fill:#d1fae5,stroke:#059669,color:#064e3b;\n`;
+        graph += `classDef Exam fill:#ffedd5,stroke:#d97706,color:#7c2d12;\n`;
+        graph += `classDef Scholarship fill:#f3e8ff,stroke:#7c3aed,color:#5b21b6;\n`;
+
+        // Render
+        const { svg } = await mermaid.render('mermaidGraph', graph);
+        container.innerHTML = svg;
     }
 </script>
 

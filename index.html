@@ -6,87 +6,125 @@
     <title>Career Pathfinder Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
     <style>
-        :root { --primary: #0f172a; --accent: #3b82f6; --bg: #f8fafc; --card: #ffffff; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: #334155; margin: 0; padding: 20px; }
-        .container { max-width: 1400px; margin: 0 auto; }
+        :root { 
+            --primary: #2563eb; 
+            --bg: #f1f5f9; 
+            --card: #ffffff; 
+            --text: #0f172a;
+        }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
         
         /* Header */
-        header { background: var(--primary); color: white; padding: 40px 20px; border-radius: 16px; margin-bottom: 30px; text-align: center; }
-        h1 { margin: 0; font-size: 2.5rem; }
-        p { opacity: 0.9; margin-top: 10px; font-size: 1.1rem; }
+        header { text-align: center; margin-bottom: 30px; }
+        h1 { color: #1e293b; margin: 0; font-size: 2.5rem; letter-spacing: -1px; }
+        p { color: #64748b; margin-top: 10px; font-size: 1.1rem; }
 
-        /* Control Panel */
-        .controls { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: flex; flex-wrap: wrap; gap: 20px; align-items: center; justify-content: space-between; margin-bottom: 30px; }
-        select { padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; font-weight: 600; min-width: 300px; }
+        /* Controls Panel */
+        .controls { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 30px; }
         
+        .top-bar { display: flex; gap: 20px; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        
+        .select-wrapper { flex-grow: 1; min-width: 280px; }
+        label { display: block; font-size: 0.85rem; font-weight: 700; color: #64748b; margin-bottom: 5px; text-transform: uppercase; }
+        select { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; font-weight: 600; color: #334155; outline: none; transition: border 0.2s; }
+        select:focus { border-color: var(--primary); }
+
+        /* Search Box */
+        .search-box { position: relative; flex-grow: 1; min-width: 280px; }
+        .search-box input { width: 100%; padding: 12px 12px 12px 40px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; outline: none; box-sizing: border-box; }
+        .search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 20px; }
+        .search-box input:focus { border-color: var(--primary); }
+
         /* Filter Chips */
-        .filters { display: flex; gap: 10px; flex-wrap: wrap; }
-        .filter-chip { padding: 8px 16px; border-radius: 20px; border: 1px solid #e2e8f0; background: white; cursor: pointer; font-weight: 500; transition: all 0.2s; font-size: 14px; }
-        .filter-chip:hover { background: #f1f5f9; }
-        .filter-chip.active { background: var(--primary); color: white; border-color: var(--primary); }
-        
+        .filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #f1f5f9; }
+        .chip { padding: 8px 16px; border-radius: 20px; border: 1px solid #e2e8f0; background: white; cursor: pointer; font-weight: 600; font-size: 0.9rem; color: #64748b; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+        .chip:hover { background: #f8fafc; border-color: #cbd5e1; }
+        .chip.active { background: #eff6ff; color: var(--primary); border-color: var(--primary); }
+        .chip i { font-size: 1.1em; }
+
         /* View Toggle */
-        .view-toggle { display: flex; background: #f1f5f9; padding: 4px; border-radius: 8px; }
-        .toggle-btn { border: none; background: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; color: #64748b; cursor: pointer; }
-        .toggle-btn.active { background: white; color: var(--primary); shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .view-toggle { display: flex; justify-content: center; gap: 15px; }
+        .toggle-btn { border: none; background: none; font-weight: 600; color: #94a3b8; cursor: pointer; padding: 5px 10px; display: flex; align-items: center; gap: 5px; }
+        .toggle-btn.active { color: var(--primary); border-bottom: 2px solid var(--primary); }
 
         /* Grid View */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
-        .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; transition: transform 0.2s; position: relative; overflow: hidden; }
-        .card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-color: var(--accent); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px; }
+        .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; transition: all 0.2s; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+        .card:hover { transform: translateY(-4px); box-shadow: 0 12px 20px -5px rgba(0,0,0,0.1); border-color: var(--primary); }
         
-        /* Color Coding */
-        .card.Study { border-top: 5px solid #3b82f6; } /* Blue */
-        .card.Job { border-top: 5px solid #10b981; }   /* Green */
-        .card.Exam { border-top: 5px solid #f59e0b; }  /* Orange */
-        .card.Scholarship { border-top: 5px solid #8b5cf6; } /* Purple */
+        /* Category Stripes */
+        .card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; }
+        .card.Study::before { background: #3b82f6; }       /* Blue */
+        .card.Job::before { background: #10b981; }         /* Green */
+        .card.Exam::before { background: #f59e0b; }        /* Orange */
+        .card.Scholarship::before { background: #8b5cf6; } /* Purple */
 
-        .card h3 { margin: 0 0 10px 0; color: #0f172a; }
-        .tag { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; color: #64748b; margin-bottom: 15px; display: block; }
-        .desc { font-size: 0.95rem; line-height: 1.6; color: #475569; margin-bottom: 20px; }
+        .card-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px; }
+        .card h3 { margin: 0; font-size: 1.15rem; color: #1e293b; line-height: 1.4; }
+        .cat-badge { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; padding: 4px 8px; border-radius: 6px; letter-spacing: 0.5px; }
+        .cat-badge.Study { background: #eff6ff; color: #3b82f6; }
+        .cat-badge.Job { background: #ecfdf5; color: #10b981; }
+        .cat-badge.Exam { background: #fffbeb; color: #f59e0b; }
+        .cat-badge.Scholarship { background: #f5f3ff; color: #8b5cf6; }
+
+        .desc { font-size: 0.95rem; color: #475569; line-height: 1.6; margin-bottom: 20px; flex-grow: 1; }
         
-        .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.85rem; background: #f8fafc; padding: 12px; border-radius: 8px; }
-        .meta-item strong { display: block; color: #0f172a; margin-bottom: 2px; }
+        /* Stats Grid */
+        .meta { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.85rem; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #f1f5f9; }
+        .meta-item { display: flex; flex-direction: column; }
+        .meta-label { font-weight: 600; color: #64748b; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 2px; }
+        .meta-val { color: #0f172a; font-weight: 500; }
 
-        /* Flowchart Container */
-        #flowchart-view { background: white; border-radius: 12px; padding: 40px; min-height: 500px; display: none; overflow: auto; text-align: center; }
-        
-        /* Loading */
-        #loading { text-align: center; font-size: 1.2rem; color: #64748b; margin-top: 50px; }
+        /* Flowchart */
+        #flowchart-view { background: white; padding: 40px; border-radius: 12px; min-height: 500px; display: none; overflow: auto; text-align: center; border: 1px solid #e2e8f0; }
 
+        #loading { text-align: center; color: #64748b; margin-top: 50px; font-size: 1.2rem; }
+        .no-results { grid-column: 1 / -1; text-align: center; padding: 40px; color: #64748b; background: white; border-radius: 12px; border: 2px dashed #e2e8f0; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1>🎓 Career Pathfinder Pro</h1>
-        <p>Verified Database: Bachelor's, Master's, PhD, Fellowships (CSIR/GATE/NFOBC), and Abroad Options.</p>
+        <h1>🚀 Career Pathfinder</h1>
+        <p>Verified roadmap for 10th, 12th, MBBS, Engineering, and PhD students.</p>
     </header>
 
     <div class="controls">
-        <div>
-            <label style="display:block; font-size:12px; font-weight:bold; color:#64748b; margin-bottom:5px;">CURRENT STAGE</label>
-            <select id="stageSelect" onchange="refreshData()"><option value="all">Loading...</option></select>
+        <div class="top-bar">
+            <div class="select-wrapper">
+                <label>I have completed</label>
+                <select id="stageSelect" onchange="refreshData()">
+                    <option value="all">Loading data...</option>
+                </select>
+            </div>
+            
+            <div class="search-box">
+                <label>Search (e.g., "Biology", "NASA", "Germany")</label>
+                <i class="ph ph-magnifying-glass"></i>
+                <input type="text" id="searchInput" placeholder="Type to filter..." onkeyup="refreshData()">
+            </div>
         </div>
 
         <div class="filters">
-            <div class="filter-chip active" onclick="setFilter('all', this)">All Options</div>
-            <div class="filter-chip" onclick="setFilter('Study', this)">🎓 Degrees (UG/PG/PhD)</div>
-            <div class="filter-chip" onclick="setFilter('Job', this)">💼 Jobs & PSUs</div>
-            <div class="filter-chip" onclick="setFilter('Exam', this)">📝 Exams (NET/GATE/GRE)</div>
-            <div class="filter-chip" onclick="setFilter('Scholarship', this)">💰 Fellowships (JRF/NFOBC)</div>
+            <div class="chip active" onclick="setFilter('all', this)"><i class="ph ph-squares-four"></i> All</div>
+            <div class="chip" onclick="setFilter('Study', this)"><i class="ph ph-graduation-cap"></i> Courses</div>
+            <div class="chip" onclick="setFilter('Job', this)"><i class="ph ph-briefcase"></i> Jobs</div>
+            <div class="chip" onclick="setFilter('Exam', this)"><i class="ph ph-pencil-simple"></i> Exams</div>
+            <div class="chip" onclick="setFilter('Scholarship', this)"><i class="ph ph-currency-inr"></i> Scholarships</div>
         </div>
 
         <div class="view-toggle">
-            <button class="toggle-btn active" onclick="setView('grid', this)">Grid View</button>
-            <button class="toggle-btn" onclick="setView('flowchart', this)">Flowchart View</button>
+            <button class="toggle-btn active" onclick="setView('grid', this)"><i class="ph ph-grid-four"></i> Grid</button>
+            <button class="toggle-btn" onclick="setView('flowchart', this)"><i class="ph ph-tree-structure"></i> Flowchart</button>
         </div>
     </div>
 
-    <div id="loading">Loading Database...</div>
+    <div id="loading"><i class="ph ph-spinner ph-spin"></i> Loading database...</div>
     <div id="grid-view" class="grid"></div>
     <div id="flowchart-view" class="mermaid"></div>
 </div>
@@ -101,7 +139,7 @@
     let currentFilter = 'all';
     let currentView = 'grid';
 
-    mermaid.initialize({ startOnLoad: false, theme: 'neutral' });
+    mermaid.initialize({ startOnLoad: false, theme: 'base', themeVariables: { primaryColor: '#eff6ff', edgeLabelBackground:'#fff', tertiaryColor: '#fff' } });
 
     window.onload = function() {
         Papa.parse(SHEET_CSV_URL, {
@@ -116,8 +154,9 @@
 
     function populateDropdown() {
         const select = document.getElementById('stageSelect');
+        // Get unique stages and sort them
         const stages = [...new Set(allData.map(d => d.Current_Stage))].sort();
-        select.innerHTML = '<option value="all">Select your current qualification...</option>';
+        select.innerHTML = '<option value="all">Select your qualification...</option>';
         stages.forEach(s => {
             if(s) select.innerHTML += `<option value="${s}">${s}</option>`;
         });
@@ -125,7 +164,7 @@
 
     function setFilter(filter, btn) {
         currentFilter = filter;
-        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
         btn.classList.add('active');
         refreshData();
     }
@@ -141,19 +180,29 @@
 
     function refreshData() {
         const stage = document.getElementById('stageSelect').value;
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
         const container = document.getElementById('grid-view');
-        
+
         if(stage === 'all') {
-            container.innerHTML = '<p style="text-align:center; width:100%">Please select a qualification stage above.</p>';
+            container.innerHTML = '<div class="no-results">Please select your current qualification stage from the dropdown above.</div>';
             document.getElementById('flowchart-view').innerHTML = '';
             return;
         }
 
-        // Filter Data
+        // Filter Logic
         const filtered = allData.filter(item => {
+            // 1. Stage Match
             if (item.Current_Stage !== stage) return false;
-            if (currentFilter === 'all') return true;
-            return item.Category.includes(currentFilter);
+            
+            // 2. Category Match
+            if (currentFilter !== 'all' && !item.Category.includes(currentFilter)) return false;
+
+            // 3. Search Term Match
+            if (searchTerm) {
+                const searchStr = (item.Option_Name + item.Description + item.Admission_Exam).toLowerCase();
+                if (!searchStr.includes(searchTerm)) return false;
+            }
+            return true;
         });
 
         if (currentView === 'grid') renderGrid(filtered);
@@ -165,27 +214,47 @@
         container.innerHTML = '';
         
         if (data.length === 0) {
-            container.innerHTML = '<p>No results found for this category.</p>'; return;
+            container.innerHTML = '<div class="no-results">No results found. Try changing filters or search terms.</div>'; 
+            return;
         }
 
         data.forEach(item => {
-            // Logic: Hide Fees/Duration for Jobs
+            // Clean Category for CSS class
+            const catClass = item.Category.split(' ')[0];
+            
+            // Smart Logic: Hide irrelevant fields based on Category
             const isJob = item.Category.includes('Job');
             const isSchol = item.Category.includes('Scholarship');
             const isExam = item.Category.includes('Exam');
 
-            let meta = '';
-            if(!isJob && !isExam && item.Duration) meta += `<div class="meta-item"><strong>⏳ Duration</strong>${item.Duration}</div>`;
-            if(!isJob && !isSchol && !isExam && item.Approx_Fees) meta += `<div class="meta-item"><strong>💸 Fees</strong>${item.Approx_Fees}</div>`;
-            if(item.Average_Salary) meta += `<div class="meta-item"><strong>💰 ${isSchol ? 'Stipend/Grant' : 'Expect. Salary'}</strong>${item.Average_Salary}</div>`;
-            if(item.Admission_Exam) meta += `<div class="meta-item"><strong>📝 Exam/Process</strong>${item.Admission_Exam}</div>`;
+            let metaHtml = '';
+            
+            // 1. Duration (Hide for Jobs/Exams)
+            if(!isJob && !isExam && item.Duration) 
+                metaHtml += `<div class="meta-item"><span class="meta-label">Duration</span><span class="meta-val">${item.Duration}</span></div>`;
+            
+            // 2. Fees (Hide for Jobs/Scholarships)
+            if(!isJob && !isSchol && !isExam && item.Approx_Fees) 
+                metaHtml += `<div class="meta-item"><span class="meta-label">Approx Fees</span><span class="meta-val">${item.Approx_Fees}</span></div>`;
+            
+            // 3. Salary/Stipend (Show for Jobs and Scholarships)
+            if(item.Average_Salary) {
+                const label = isSchol ? 'Grant/Stipend' : 'Avg Salary';
+                metaHtml += `<div class="meta-item"><span class="meta-label">${label}</span><span class="meta-val">${item.Average_Salary}</span></div>`;
+            }
+
+            // 4. Exam (Show if exists)
+            if(item.Admission_Exam) 
+                metaHtml += `<div class="meta-item"><span class="meta-label">Entrance/Exam</span><span class="meta-val">${item.Admission_Exam}</span></div>`;
 
             container.innerHTML += `
-                <div class="card ${item.Category.split(' ')[0]}">
-                    <span class="tag">${item.Category}</span>
-                    <h3>${item.Option_Name}</h3>
+                <div class="card ${catClass}">
+                    <div class="card-header">
+                        <h3>${item.Option_Name}</h3>
+                        <span class="cat-badge ${catClass}">${item.Category}</span>
+                    </div>
                     <div class="desc">${item.Description}</div>
-                    <div class="meta-grid">${meta}</div>
+                    <div class="meta">${metaHtml}</div>
                 </div>
             `;
         });
@@ -193,35 +262,38 @@
 
     async function renderFlowchart(root, data) {
         const container = document.getElementById('flowchart-view');
-        container.innerHTML = ''; // Clear previous
+        container.innerHTML = ''; 
         
         if(data.length === 0) { container.innerHTML = 'No data to chart.'; return; }
 
-        // Generate Mermaid Syntax
         let graph = `graph TD\n`;
-        graph += `ROOT[${root}]:::rootNode\n`;
+        // Root Node Style
+        graph += `ROOT("${root}"):::rootNode\n`;
         
         data.forEach((item, index) => {
-            // Sanitize ID (remove spaces/special chars)
             let id = `node${index}`;
-            let label = item.Option_Name.replace(/["()]/g, '');
+            // Remove special chars for Mermaid compatibility
+            let label = item.Option_Name.replace(/["()]/g, ''); 
+            let cat = item.Category.split(' ')[0];
+            graph += `ROOT --> ${id}["${label}"]:::${cat}\n`;
             
-            // Color coding classes
-            let className = item.Category.split(' ')[0];
-            
-            graph += `ROOT --> ${id}["${label}"]:::${className}\n`;
+            // Optional: Click event logic could go here
         });
 
-        // Styles
-        graph += `classDef rootNode fill:#0f172a,color:#fff,stroke:#333,stroke-width:2px;\n`;
-        graph += `classDef Study fill:#dbeafe,stroke:#2563eb,color:#1e3a8a;\n`;
-        graph += `classDef Job fill:#d1fae5,stroke:#059669,color:#064e3b;\n`;
-        graph += `classDef Exam fill:#ffedd5,stroke:#d97706,color:#7c2d12;\n`;
-        graph += `classDef Scholarship fill:#f3e8ff,stroke:#7c3aed,color:#5b21b6;\n`;
+        // Mermaid Styling
+        graph += `classDef rootNode fill:#1e293b,color:#fff,stroke:none,rx:5,ry:5,padding:15px;\n`;
+        graph += `classDef Study fill:#eff6ff,stroke:#3b82f6,color:#1e3a8a,rx:5,ry:5;\n`;
+        graph += `classDef Job fill:#ecfdf5,stroke:#10b981,color:#064e3b,rx:5,ry:5;\n`;
+        graph += `classDef Exam fill:#fffbeb,stroke:#f59e0b,color:#7c2d12,rx:5,ry:5;\n`;
+        graph += `classDef Scholarship fill:#f5f3ff,stroke:#8b5cf6,color:#5b21b6,rx:5,ry:5;\n`;
 
-        // Render
-        const { svg } = await mermaid.render('mermaidGraph', graph);
-        container.innerHTML = svg;
+        try {
+            const { svg } = await mermaid.render('mermaidGraph', graph);
+            container.innerHTML = svg;
+        } catch(e) {
+            container.innerHTML = 'Error generating chart. Please try Grid View.';
+            console.error(e);
+        }
     }
 </script>
 

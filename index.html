@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NextStep: Career Pathfinder</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #1e40af;
+            --bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --text: #1f2937;
+        }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        
+        /* Header */
+        header { text-align: center; margin-bottom: 40px; }
+        h1 { color: var(--primary); margin-bottom: 10px; }
+        p { color: #666; max-width: 600px; margin: 0 auto; }
+
+        /* Search/Filter Section */
+        .controls { background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-bottom: 30px; }
+        select { padding: 10px 20px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; outline: none; min-width: 250px; }
+        select:focus { border-color: var(--primary); }
+
+        /* Cards Grid */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        
+        /* Card Styles */
+        .card { background: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: transform 0.2s; border-left: 5px solid var(--primary); display: flex; flex-direction: column; }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .card h3 { margin-top: 0; color: var(--secondary); }
+        .tag { display: inline-block; background: #e0e7ff; color: var(--primary); padding: 4px 10px; border-radius: 15px; font-size: 12px; font-weight: bold; margin-bottom: 10px; }
+        .details { font-size: 14px; margin: 15px 0; line-height: 1.6; flex-grow: 1; }
+        .meta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px; color: #555; background: #f8fafc; padding: 10px; border-radius: 8px; margin-top: 10px; }
+        .meta div strong { display: block; color: #333; margin-bottom: 2px; }
+
+        /* Suggestion/Rating Section */
+        .actions { margin-top: 15px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; padding-top: 10px; }
+        .btn { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; text-decoration: none; }
+        .btn:hover { background: var(--secondary); }
+        .rating-display { color: #f59e0b; font-weight: bold; }
+
+        /* Loading State */
+        #loading { text-align: center; font-size: 18px; color: #666; margin-top: 50px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>🎓 NextStep Career Guide</h1>
+        <p>Select your current educational stage to discover verified career paths, scholarships, and opportunities.</p>
+    </header>
+
+    <div class="controls">
+        <label for="stageSelect" style="align-self: center; font-weight: bold;">I have completed:</label>
+        <select id="stageSelect" onchange="filterData()">
+            <option value="all">Select your stage...</option>
+            </select>
+    </div>
+
+    <div id="loading">Loading career data...</div>
+    <div id="results" class="grid"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+<script>
+    // ---------------------------------------------------------
+    // 🔴 REPLACE THIS LINK WITH YOUR PUBLISHED CSV LINK 🔴
+    const SHEET_CSV_URL = https://docs.google.com/spreadsheets/d/e/2PACX-1vTS-7VnjzzDZDXXiSYTcpBQwov0_ErYcZHufwKgmDQf5-Bt1NK0qot1JvAbhigaHL6iots2aIM7cdI2/pub?output=csv;
+    // ---------------------------------------------------------
+
+    // Link to a Google Form for users to suggest edits (Create a form and paste link here)
+    const SUGGESTION_FORM_URL = 'YOUR_GOOGLE_FORM_LINK';
+
+    let allData = [];
+
+    // Initialize
+    window.onload = function() {
+        Papa.parse(SHEET_CSV_URL, {
+            download: true,
+            header: true,
+            complete: function(results) {
+                allData = results.data;
+                populateDropdown();
+                document.getElementById('loading').style.display = 'none';
+            },
+            error: function(err) {
+                document.getElementById('loading').innerHTML = "Error loading data. Please check the sheet link.";
+                console.error(err);
+            }
+        });
+    };
+
+    function populateDropdown() {
+        const stages = [...new Set(allData.map(item => item.Current_Stage).filter(Boolean))];
+        const select = document.getElementById('stageSelect');
+        stages.forEach(stage => {
+            const option = document.createElement('option');
+            option.value = stage;
+            option.textContent = stage;
+            select.appendChild(option);
+        });
+    }
+
+    function filterData() {
+        const selectedStage = document.getElementById('stageSelect').value;
+        const container = document.getElementById('results');
+        container.innerHTML = '';
+
+        if (selectedStage === 'all') return;
+
+        const filtered = allData.filter(item => item.Current_Stage === selectedStage);
+
+        if (filtered.length === 0) {
+            container.innerHTML = '<p style="text-align:center; width:100%">No data found for this selection.</p>';
+            return;
+        }
+
+        filtered.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <span class="tag">${item.Category}</span>
+                <h3>${item.Option_Name}</h3>
+                <div class="details">${item.Description}</div>
+                <div class="meta">
+                    <div><strong>⏱ Duration</strong>${item.Duration}</div>
+                    <div><strong>📈 Difficulty</strong>${item.Difficulty_Level}</div>
+                    <div><strong>💰 Scope/Salary</strong>${item.Job_Scope_Salary}</div>
+                    <div><strong>📝 Admission</strong>${item.Admission_Process}</div>
+                </div>
+                <div class="actions">
+                    <span class="rating-display">⭐ Verify/Rate</span>
+                    <a href="${SUGGESTION_FORM_URL}" target="_blank" class="btn">Suggest Edit</a>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+</script>
+
+</body>
+</html>

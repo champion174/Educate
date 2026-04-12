@@ -100,7 +100,7 @@
 <script>
     // ============================================================================
     // 🔴 1. MAIN DATA: Your original CSV link
-    const MAIN_CSV_URL = '';
+    const MAIN_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTS-7VnjzzDZDXXiSYTcpBQwov0_ErYcZHufwKgmDQf5-Bt1NK0qot1JvAbhigaHL6iots2aIM7cdI2/pub?gid=0&single=true&output=csv';
     
     // 🔴 2. COMMUNITY DATA: The CSV link for the "Approved" tab
     const APPROVED_COMMENTS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRTAmgpSCAOM7xBUoZd4HHvkivsJ0wM1qof-ujygb5vzrN1njB-hNO0kqy9yOgtBtStmSdf0_ch7cPp/pub?gid=351018171&single=true&output=csv';
@@ -155,16 +155,15 @@
             // Bulletproof search check
             const searchString = ((item.Option_Name || '') + (item.Description || '')).toLowerCase();
             if (search && !searchString.includes(search)) return false;
-            return true;
+            return true; // <--- This is legal because it's inside the filter function
         });
 
         if (filtered.length === 0) { 
             container.innerHTML = '<p>No results found.</p>'; 
-            return; 
+            return; // <--- This is legal because it's inside renderGrid()
         }
 
         filtered.forEach((item, index) => {
-            // Bulletproof description length check
             const shortDesc = (item.Description || '').substring(0, 80);
             
             container.innerHTML += `
@@ -172,22 +171,6 @@
                     <span class="tag">${item.Category || 'General'}</span>
                     <h3>${item.Option_Name || 'Unknown Option'}</h3>
                     <p style="font-size: 0.9rem; color: #475569; margin:0;">${shortDesc}...</p>
-                    <div style="margin-top: 15px; font-size: 14px; color: var(--primary); font-weight: bold;">
-                        Read Details →
-                    </div>
-                </div>
-            `;
-        });
-    }
-
-        if (filtered.length === 0) { container.innerHTML = '<p>No results found.</p>'; return; }
-
-        filtered.forEach((item, index) => {
-            container.innerHTML += `
-                <div class="card" onclick="openModal(${index})">
-                    <span class="tag">${item.Category}</span>
-                    <h3>${item.Option_Name}</h3>
-                    <p style="font-size: 0.9rem; color: #475569; margin:0;">${item.Description.substring(0, 80)}...</p>
                     <div style="margin-top: 15px; font-size: 14px; color: var(--primary); font-weight: bold;">
                         Read Details →
                     </div>

@@ -3,49 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Career Pathfinder Pro</title>
+    <title>Career Pathfinder Pro Ultimate</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
     <style>
-        :root { --primary: #2563eb; --bg: #f1f5f9; --text: #0f172a; }
+        :root { 
+            --primary: #2563eb; 
+            --bg: #f1f5f9; 
+            --card: #ffffff; 
+            --text: #0f172a;
+        }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
         .container { max-width: 1200px; margin: 0 auto; padding-bottom: 80px; }
         
         /* Header & Admin */
         header { text-align: center; margin-bottom: 30px; position: relative; }
-        h1 { color: #1e293b; margin: 0; font-size: 2.5rem; }
-        p { color: #64748b; margin-top: 10px; }
-        .admin-btn { position: absolute; top: 0; right: 0; background: none; border: none; font-size: 24px; cursor: pointer; color: #cbd5e1; transition: color 0.2s; }
+        h1 { color: #1e293b; margin: 0; font-size: 2.5rem; letter-spacing: -1px; }
+        p { color: #64748b; margin-top: 10px; font-size: 1.1rem; }
+        .admin-btn { position: absolute; top: 0; right: 0; background: none; border: none; font-size: 28px; cursor: pointer; color: #cbd5e1; transition: color 0.2s; }
         .admin-btn:hover { color: var(--primary); }
 
-        /* Controls */
-        .controls { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 30px; display: flex; gap: 15px; flex-wrap: wrap; }
-        select, input { padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; outline: none; flex-grow: 1; }
+        /* Controls Panel */
+        .controls { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 30px; }
+        .top-bar { display: flex; gap: 20px; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        
+        .select-wrapper, .search-box { flex-grow: 1; min-width: 280px; position: relative; }
+        label { display: block; font-size: 0.85rem; font-weight: 700; color: #64748b; margin-bottom: 5px; text-transform: uppercase; }
+        select, input { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; font-weight: 600; color: #334155; outline: none; box-sizing: border-box; transition: border 0.2s; }
         select:focus, input:focus { border-color: var(--primary); }
+        .search-box i { position: absolute; left: 12px; top: 38px; color: #94a3b8; font-size: 20px; }
+        .search-box input { padding-left: 40px; font-weight: normal; }
 
-        /* Grid */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
-        .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.2s; border-left: 5px solid var(--primary); }
-        .card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-        .card h3 { margin: 0 0 10px 0; color: #1e293b; }
-        .card .tag { font-size: 0.75rem; background: #eff6ff; color: #2563eb; padding: 4px 8px; border-radius: 6px; font-weight: bold; }
+        /* Filter Chips */
+        .filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #f1f5f9; }
+        .chip { padding: 8px 16px; border-radius: 20px; border: 1px solid #e2e8f0; background: white; cursor: pointer; font-weight: 600; font-size: 0.9rem; color: #64748b; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+        .chip:hover { background: #f8fafc; border-color: #cbd5e1; }
+        .chip.active { background: #eff6ff; color: var(--primary); border-color: var(--primary); }
 
-        /* Modal (Flashcard Details) */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; box-sizing: border-box; }
+        /* View Toggle */
+        .view-toggle { display: flex; justify-content: center; gap: 15px; }
+        .toggle-btn { border: none; background: none; font-weight: 600; color: #94a3b8; cursor: pointer; padding: 5px 10px; display: flex; align-items: center; gap: 5px; }
+        .toggle-btn.active { color: var(--primary); border-bottom: 2px solid var(--primary); }
+
+        /* Grid View */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px; }
+        .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+        .card:hover { transform: translateY(-4px); box-shadow: 0 12px 20px -5px rgba(0,0,0,0.1); border-color: var(--primary); }
+        
+        .card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; }
+        .card.Study::before { background: #3b82f6; }
+        .card.Job::before { background: #10b981; }
+        .card.Exam::before { background: #f59e0b; }
+        .card.Scholarship::before { background: #8b5cf6; }
+
+        .card h3 { margin: 0 0 10px 0; font-size: 1.15rem; color: #1e293b; line-height: 1.4; }
+        .cat-badge { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; padding: 4px 8px; border-radius: 6px; display: inline-block; margin-bottom: 12px; }
+        .cat-badge.Study { background: #eff6ff; color: #3b82f6; }
+        .cat-badge.Job { background: #ecfdf5; color: #10b981; }
+        .cat-badge.Exam { background: #fffbeb; color: #f59e0b; }
+        .cat-badge.Scholarship { background: #f5f3ff; color: #8b5cf6; }
+        
+        .desc { font-size: 0.95rem; color: #475569; margin:0; flex-grow: 1; }
+        .read-more { margin-top: 15px; font-size: 13px; color: var(--primary); font-weight: bold; }
+
+        /* Flowchart View */
+        #flowchart-view { background: white; padding: 40px; border-radius: 12px; min-height: 500px; display: none; overflow: auto; text-align: center; border: 1px solid #e2e8f0; }
+
+        /* Modal Details */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; box-sizing: border-box; backdrop-filter: blur(4px); }
         .modal-overlay.active { display: flex; }
         .modal-content { background: white; width: 100%; max-width: 700px; max-height: 90vh; border-radius: 16px; padding: 30px; overflow-y: auto; position: relative; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
         .close-btn { position: absolute; top: 20px; right: 20px; background: #f1f5f9; border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; }
         .close-btn:hover { background: #e2e8f0; }
         
-        .modal-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; background: #f8fafc; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #e2e8f0; }
-        .meta-item strong { display: block; font-size: 0.8rem; color: #64748b; text-transform: uppercase; }
+        .modal-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; background: #f8fafc; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #e2e8f0; font-size: 0.9rem; }
+        .meta-item strong { display: block; font-size: 0.75rem; color: #64748b; text-transform: uppercase; margin-bottom: 2px; }
 
-        /* Community Contributions Section */
+        /* Community Section in Modal */
         .community-section { margin-top: 30px; padding-top: 20px; border-top: 2px dashed #e2e8f0; }
         .community-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .btn-contribute { background: var(--primary); color: white; text-decoration: none; padding: 8px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: bold; }
-        .btn-contribute:hover { background: #1d4ed8; }
         .comment-card { background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #10b981; }
         .comment-author { font-weight: bold; font-size: 0.9rem; color: #0f172a; margin-bottom: 5px; }
 
@@ -55,6 +94,8 @@
         .fab-tooltip { position: absolute; right: 75px; background: #0f172a; color: white; padding: 6px 12px; border-radius: 6px; font-size: 14px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
         .fab:hover .fab-tooltip { opacity: 1; }
 
+        #loading { text-align: center; color: #64748b; margin-top: 50px; font-size: 1.2rem; }
+        .no-results { grid-column: 1 / -1; text-align: center; padding: 40px; color: #64748b; background: white; border-radius: 12px; border: 2px dashed #e2e8f0; }
     </style>
 </head>
 <body>
@@ -67,74 +108,92 @@
     </header>
 
     <div class="controls">
-        <select id="stageSelect" onchange="renderGrid()"><option value="all">Loading...</option></select>
-        <input type="text" id="searchInput" placeholder="Search courses, exams, jobs..." onkeyup="renderGrid()">
+        <div class="top-bar">
+            <div class="select-wrapper">
+                <label>I have completed</label>
+                <select id="stageSelect" onchange="refreshData()"><option value="all">Loading data...</option></select>
+            </div>
+            <div class="search-box">
+                <label>Search Paths</label>
+                <i class="ph ph-magnifying-glass"></i>
+                <input type="text" id="searchInput" placeholder="e.g. NASA, Biology, MBBS..." onkeyup="refreshData()">
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="chip active" onclick="setFilter('all', this)"><i class="ph ph-squares-four"></i> All</div>
+            <div class="chip" onclick="setFilter('Study', this)"><i class="ph ph-graduation-cap"></i> Courses</div>
+            <div class="chip" onclick="setFilter('Job', this)"><i class="ph ph-briefcase"></i> Jobs</div>
+            <div class="chip" onclick="setFilter('Exam', this)"><i class="ph ph-pencil-simple"></i> Exams</div>
+            <div class="chip" onclick="setFilter('Scholarship', this)"><i class="ph ph-currency-inr"></i> Scholarships</div>
+        </div>
+
+        <div class="view-toggle">
+            <button class="toggle-btn active" onclick="setView('grid', this)"><i class="ph ph-grid-four"></i> Grid View</button>
+            <button class="toggle-btn" onclick="setView('flowchart', this)"><i class="ph ph-tree-structure"></i> Flowchart View</button>
+        </div>
     </div>
 
-    <div id="grid-view" class="grid">Loading Database...</div>
+    <div id="loading"><i class="ph ph-spinner ph-spin"></i> Loading database...</div>
+    <div id="grid-view" class="grid"></div>
+    <div id="flowchart-view" class="mermaid"></div>
 </div>
 
 <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
     <div class="modal-content" onclick="event.stopPropagation()">
         <button class="close-btn" onclick="closeModal(true)"><i class="ph ph-x"></i></button>
-        <div id="modalContent">
-            </div>
+        <div id="modalContent"></div>
         
         <div class="community-section">
             <div class="community-header">
-                <h3>👥 Community Insights</h3>
+                <h3 style="margin:0;">👥 Community Insights</h3>
                 <a href="#" id="contributeLink" target="_blank" class="btn-contribute">+ Add Your Experience</a>
             </div>
-            <p style="font-size: 12px; color: #64748b; margin-top: -10px; margin-bottom: 15px;">Entries are reviewed by admins before appearing publicly.</p>
-            <div id="communityComments">
-                </div>
+            <p style="font-size: 12px; color: #64748b; margin-top: 5px;">Entries are reviewed by admins before appearing publicly.</p>
+            <div id="communityComments"></div>
         </div>
     </div>
 </div>
 
-<a href="https://docs.google.com/forms/d/e/1FAIpQLSdILPhUbVozR5f-Gka-kDe1_Z9NiXzRiGq3aCJc99qqyb-iHQ/viewform?usp=dialog" target="_blank" class="fab">
+<a href="https://docs.google.com/forms/d/e/1FAIpQLSdILPhUbVozR5f-Gka-kDe1_Z9NiXzRiGq3aCJc99qqyb-iHQ/viewform?usp=dialog" target="_blank" class="fab" title="Site Feedback">
     <i class="ph ph-chat-teardrop-text"></i>
     <span class="fab-tooltip">Site Feedback</span>
 </a>
 
 <script>
     // ============================================================================
-    // 🔴 1. MAIN DATA: Your original CSV link
+    // 🔴 INJECTED: Your actual links extracted from your snippet
     const MAIN_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTS-7VnjzzDZDXXiSYTcpBQwov0_ErYcZHufwKgmDQf5-Bt1NK0qot1JvAbhigaHL6iots2aIM7cdI2/pub?gid=0&single=true&output=csv';
-    
-    // 🔴 2. COMMUNITY DATA: The CSV link for the "Approved" tab
     const APPROVED_COMMENTS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRTAmgpSCAOM7xBUoZd4HHvkivsJ0wM1qof-ujygb5vzrN1njB-hNO0kqy9yOgtBtStmSdf0_ch7cPp/pub?gid=351018171&single=true&output=csv';
-    
-    // 🔴 3. CONTRIBUTE FORM: The base URL of your detailed input Google form
-    const CONTRIBUTE_FORM_BASE_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdRRfNU_Fjn61zNgRZRvmyC18bY9GIo-d6e_zrxuVf3zX5c5g/viewform?usp=pp_url&entry.1250441864'; 
-    
-    // 🔴 4. ADMIN DETAILS
-    const ADMIN_EDIT_LINK = 'https://docs.google.com/spreadsheets/d/1rvU0Ci2fxTvPSy1dvO6tyh-R5-B_3CfYgyzjzDZsbQg/edit?resourcekey=&gid=351018171#gid=351018171'; // The standard drive.google link
-    const ADMIN_PIN = '1234'; // Change this to whatever you want
+    const ADMIN_EDIT_LINK = 'https://docs.google.com/spreadsheets/d/1rvU0Ci2fxTvPSy1dvO6tyh-R5-B_3CfYgyzjzDZsbQg/edit?resourcekey=&gid=351018171#gid=351018171'; 
+    const ADMIN_PIN = '50078'; 
     // ============================================================================
 
     let allData = [];
+    let currentFilteredData = [];
     let approvedComments = [];
+    let currentFilter = 'all';
+    let currentView = 'grid';
+
+    mermaid.initialize({ startOnLoad: false, theme: 'base', themeVariables: { primaryColor: '#eff6ff', edgeLabelBackground:'#fff', tertiaryColor: '#fff' } });
 
     window.onload = function() {
-        // Fetch Main Data
         Papa.parse(MAIN_CSV_URL, {
             download: true, header: true, skipEmptyLines: true,
             complete: function(results) {
                 allData = results.data;
                 populateDropdown();
-                renderGrid();
+                document.getElementById('loading').style.display = 'none';
             }
         });
 
-        // Fetch Approved Comments (We do this silently in the background)
-        Papa.parse(APPROVED_COMMENTS_CSV_URL, {
-            download: true, header: true, skipEmptyLines: true,
-            complete: function(results) {
-                approvedComments = results.data;
-            },
-            error: function() { console.log("No community data found yet or link missing."); }
-        });
+        if(APPROVED_COMMENTS_CSV_URL !== '') {
+            Papa.parse(APPROVED_COMMENTS_CSV_URL, {
+                download: true, header: true, skipEmptyLines: true,
+                complete: function(results) { approvedComments = results.data; },
+                error: function() { console.log("No community data found."); }
+            });
+        }
     };
 
     function populateDropdown() {
@@ -144,61 +203,111 @@
         stages.forEach(s => { if(s) select.innerHTML += `<option value="${s}">${s}</option>`; });
     }
 
-    function renderGrid() {
+    function setFilter(filter, btn) {
+        currentFilter = filter;
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        refreshData();
+    }
+
+    function setView(view, btn) {
+        currentView = view;
+        document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('grid-view').style.display = view === 'grid' ? 'grid' : 'none';
+        document.getElementById('flowchart-view').style.display = view === 'flowchart' ? 'block' : 'none';
+        refreshData();
+    }
+
+    function refreshData() {
         const stage = document.getElementById('stageSelect').value;
         const search = document.getElementById('searchInput').value.toLowerCase();
         const container = document.getElementById('grid-view');
-        container.innerHTML = '';
 
-        const filtered = allData.filter(item => {
-            if (stage !== 'all' && item.Current_Stage !== stage) return false;
-            // Bulletproof search check
-            const searchString = ((item.Option_Name || '') + (item.Description || '')).toLowerCase();
-            if (search && !searchString.includes(search)) return false;
-            return true; // <--- This is legal because it's inside the filter function
-        });
-
-        if (filtered.length === 0) { 
-            container.innerHTML = '<p>No results found.</p>'; 
-            return; // <--- This is legal because it's inside renderGrid()
+        if(stage === 'all') {
+            container.innerHTML = '<div class="no-results">Please select your current qualification stage from the dropdown above.</div>';
+            document.getElementById('flowchart-view').innerHTML = '';
+            return;
         }
 
-        filtered.forEach((item, index) => {
+        // Apply filters and save to global currentFilteredData
+        currentFilteredData = allData.filter(item => {
+            if (item.Current_Stage !== stage) return false;
+            if (currentFilter !== 'all' && !(item.Category || '').includes(currentFilter)) return false;
+            
+            const searchStr = ((item.Option_Name || '') + (item.Description || '') + (item.Admission_Exam || '')).toLowerCase();
+            if (search && !searchStr.includes(search)) return false;
+            
+            return true;
+        });
+
+        if (currentView === 'grid') renderGrid(currentFilteredData);
+        else renderFlowchart(stage, currentFilteredData);
+    }
+
+    function renderGrid(data) {
+        const container = document.getElementById('grid-view');
+        container.innerHTML = '';
+        
+        if (data.length === 0) {
+            container.innerHTML = '<div class="no-results">No results found. Try changing filters or search terms.</div>'; 
+            return;
+        }
+
+        data.forEach((item, index) => {
+            const catClass = (item.Category || 'General').split(' ')[0];
             const shortDesc = (item.Description || '').substring(0, 80);
             
             container.innerHTML += `
-                <div class="card" onclick="openModal(${index})">
-                    <span class="tag">${item.Category || 'General'}</span>
-                    <h3>${item.Option_Name || 'Unknown Option'}</h3>
-                    <p style="font-size: 0.9rem; color: #475569; margin:0;">${shortDesc}...</p>
-                    <div style="margin-top: 15px; font-size: 14px; color: var(--primary); font-weight: bold;">
-                        Read Details →
+                <div class="card ${catClass}" onclick="openModal(${index})">
+                    <div>
+                        <span class="cat-badge ${catClass}">${item.Category || 'Path'}</span>
+                        <h3>${item.Option_Name || 'Unknown Option'}</h3>
+                        <p class="desc">${shortDesc}...</p>
                     </div>
+                    <div class="read-more">Click for Details & Comments →</div>
                 </div>
             `;
         });
     }
 
-    // Modal Logic
-    function openModal(index) {
-        const stage = document.getElementById('stageSelect').value;
-        const search = document.getElementById('searchInput').value.toLowerCase();
+    async function renderFlowchart(root, data) {
+        const container = document.getElementById('flowchart-view');
+        container.innerHTML = ''; 
+        if(data.length === 0) { container.innerHTML = 'No data to chart.'; return; }
+
+        let graph = `graph TD\n`;
+        graph += `ROOT("${root}"):::rootNode\n`;
         
-        // Find the exact item from the filtered list
-        const filtered = allData.filter(item => {
-            if (stage !== 'all' && item.Current_Stage !== stage) return false;
-            if (search && !(item.Option_Name + item.Description).toLowerCase().includes(search)) return false;
-            return true;
+        data.forEach((item, index) => {
+            let id = `node${index}`;
+            let label = (item.Option_Name || 'Unknown').replace(/["()]/g, ''); 
+            let cat = (item.Category || 'General').split(' ')[0];
+            graph += `ROOT --> ${id}["${label}"]:::${cat}\n`;
         });
-        
-        const item = filtered[index];
+
+        graph += `classDef rootNode fill:#1e293b,color:#fff,stroke:none,rx:5,ry:5,padding:15px;\n`;
+        graph += `classDef Study fill:#eff6ff,stroke:#3b82f6,color:#1e3a8a,rx:5,ry:5;\n`;
+        graph += `classDef Job fill:#ecfdf5,stroke:#10b981,color:#064e3b,rx:5,ry:5;\n`;
+        graph += `classDef Exam fill:#fffbeb,stroke:#f59e0b,color:#7c2d12,rx:5,ry:5;\n`;
+        graph += `classDef Scholarship fill:#f5f3ff,stroke:#8b5cf6,color:#5b21b6,rx:5,ry:5;\n`;
+
+        try {
+            const { svg } = await mermaid.render('mermaidGraph', graph);
+            container.innerHTML = svg;
+        } catch(e) {
+            container.innerHTML = 'Error generating chart. Please switch to Grid View.';
+        }
+    }
+
+    function openModal(index) {
+        const item = currentFilteredData[index];
         if(!item) return;
 
-        // 1. Fill Main Content
         document.getElementById('modalContent').innerHTML = `
-            <span style="font-size:12px; color:#64748b; font-weight:bold;">${item.Current_Stage} > ${item.Category}</span>
+            <span style="font-size:12px; color:#64748b; font-weight:bold; text-transform:uppercase;">${item.Current_Stage} > ${item.Category}</span>
             <h2 style="margin: 5px 0 15px 0; color: #0f172a; font-size: 2rem;">${item.Option_Name}</h2>
-            <p style="font-size: 1.1rem; line-height: 1.6; color: #334155;">${item.Description}</p>
+            <p style="font-size: 1.05rem; line-height: 1.6; color: #334155;">${item.Description || 'No description available.'}</p>
             
             <div class="modal-meta">
                 <div class="meta-item"><strong>⏳ Duration</strong> ${item.Duration || 'N/A'}</div>
@@ -208,12 +317,10 @@
             </div>
         `;
 
-        // 2. Set the link for the contribution form
-        // We append the Option_Name so users don't have to type it.
+        // INJECTED: Your specific Contribution form structure
         const encodedOption = encodeURIComponent(item.Option_Name);
-        document.getElementById('contributeLink').href = `${CONTRIBUTE_FORM_BASE_URL}?usp=pp_url&entry.1250441864=${encodedOption}`;
+        document.getElementById('contributeLink').href = `https://docs.google.com/forms/d/e/1FAIpQLSdRRfNU_Fjn61zNgRZRvmyC18bY9GIo-d6e_zrxuVf3zX5c5g/viewform?usp=pp_url&entry.1250441864=${encodedOption}`;
 
-        // 3. Load Approved Comments for this specific option
         const commentsDiv = document.getElementById('communityComments');
         commentsDiv.innerHTML = '';
         
@@ -234,9 +341,8 @@
             });
         }
 
-        // Show Modal
         document.getElementById('modalOverlay').classList.add('active');
-        document.body.style.overflow = 'hidden'; // prevent background scrolling
+        document.body.style.overflow = 'hidden';
     }
 
     function closeModal(force = false) {
@@ -246,7 +352,6 @@
         }
     }
 
-    // Admin Login Logic
     function adminLogin() {
         const pin = prompt("Enter Admin PIN to edit database:");
         if (pin === ADMIN_PIN) {

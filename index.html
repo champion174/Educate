@@ -4,86 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Career Pathfinder Pro</title>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
     <style>
-        :root { 
-            --primary: #2563eb; 
-            --bg: #f1f5f9; 
-            --card: #ffffff; 
-            --text: #0f172a;
-        }
+        :root { --primary: #2563eb; --bg: #f1f5f9; --text: #0f172a; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; }
+        .container { max-width: 1200px; margin: 0 auto; padding-bottom: 80px; }
         
-        /* Header */
-        header { text-align: center; margin-bottom: 30px; }
-        h1 { color: #1e293b; margin: 0; font-size: 2.5rem; letter-spacing: -1px; }
-        p { color: #64748b; margin-top: 10px; font-size: 1.1rem; }
+        /* Header & Admin */
+        header { text-align: center; margin-bottom: 30px; position: relative; }
+        h1 { color: #1e293b; margin: 0; font-size: 2.5rem; }
+        p { color: #64748b; margin-top: 10px; }
+        .admin-btn { position: absolute; top: 0; right: 0; background: none; border: none; font-size: 24px; cursor: pointer; color: #cbd5e1; transition: color 0.2s; }
+        .admin-btn:hover { color: var(--primary); }
 
-        /* Controls Panel */
-        .controls { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 30px; }
+        /* Controls */
+        .controls { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 30px; display: flex; gap: 15px; flex-wrap: wrap; }
+        select, input { padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; outline: none; flex-grow: 1; }
+        select:focus, input:focus { border-color: var(--primary); }
+
+        /* Grid */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+        .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.2s; border-left: 5px solid var(--primary); }
+        .card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .card h3 { margin: 0 0 10px 0; color: #1e293b; }
+        .card .tag { font-size: 0.75rem; background: #eff6ff; color: #2563eb; padding: 4px 8px; border-radius: 6px; font-weight: bold; }
+
+        /* Modal (Flashcard Details) */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; box-sizing: border-box; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: white; width: 100%; max-width: 700px; max-height: 90vh; border-radius: 16px; padding: 30px; overflow-y: auto; position: relative; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+        .close-btn { position: absolute; top: 20px; right: 20px; background: #f1f5f9; border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+        .close-btn:hover { background: #e2e8f0; }
         
-        .top-bar { display: flex; gap: 20px; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        
-        .select-wrapper { flex-grow: 1; min-width: 280px; }
-        label { display: block; font-size: 0.85rem; font-weight: 700; color: #64748b; margin-bottom: 5px; text-transform: uppercase; }
-        select { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; font-weight: 600; color: #334155; outline: none; transition: border 0.2s; }
-        select:focus { border-color: var(--primary); }
+        .modal-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; background: #f8fafc; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #e2e8f0; }
+        .meta-item strong { display: block; font-size: 0.8rem; color: #64748b; text-transform: uppercase; }
 
-        /* Search Box */
-        .search-box { position: relative; flex-grow: 1; min-width: 280px; }
-        .search-box input { width: 100%; padding: 12px 12px 12px 40px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; outline: none; box-sizing: border-box; }
-        .search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 20px; }
-        .search-box input:focus { border-color: var(--primary); }
+        /* Community Contributions Section */
+        .community-section { margin-top: 30px; padding-top: 20px; border-top: 2px dashed #e2e8f0; }
+        .community-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .btn-contribute { background: var(--primary); color: white; text-decoration: none; padding: 8px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: bold; }
+        .btn-contribute:hover { background: #1d4ed8; }
+        .comment-card { background: #f8fafc; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #10b981; }
+        .comment-author { font-weight: bold; font-size: 0.9rem; color: #0f172a; margin-bottom: 5px; }
 
-        /* Filter Chips */
-        .filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #f1f5f9; }
-        .chip { padding: 8px 16px; border-radius: 20px; border: 1px solid #e2e8f0; background: white; cursor: pointer; font-weight: 600; font-size: 0.9rem; color: #64748b; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
-        .chip:hover { background: #f8fafc; border-color: #cbd5e1; }
-        .chip.active { background: #eff6ff; color: var(--primary); border-color: var(--primary); }
-        .chip i { font-size: 1.1em; }
+        /* Floating Feedback Button */
+        .fab { position: fixed; bottom: 30px; right: 30px; background: #0f172a; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 28px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3); cursor: pointer; text-decoration: none; transition: transform 0.2s; z-index: 900; }
+        .fab:hover { transform: scale(1.1); }
+        .fab-tooltip { position: absolute; right: 75px; background: #0f172a; color: white; padding: 6px 12px; border-radius: 6px; font-size: 14px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+        .fab:hover .fab-tooltip { opacity: 1; }
 
-        /* View Toggle */
-        .view-toggle { display: flex; justify-content: center; gap: 15px; }
-        .toggle-btn { border: none; background: none; font-weight: 600; color: #94a3b8; cursor: pointer; padding: 5px 10px; display: flex; align-items: center; gap: 5px; }
-        .toggle-btn.active { color: var(--primary); border-bottom: 2px solid var(--primary); }
-
-        /* Grid View */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px; }
-        .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border: 1px solid #e2e8f0; transition: all 0.2s; display: flex; flex-direction: column; position: relative; overflow: hidden; }
-        .card:hover { transform: translateY(-4px); box-shadow: 0 12px 20px -5px rgba(0,0,0,0.1); border-color: var(--primary); }
-        
-        /* Category Stripes */
-        .card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; }
-        .card.Study::before { background: #3b82f6; }       /* Blue */
-        .card.Job::before { background: #10b981; }         /* Green */
-        .card.Exam::before { background: #f59e0b; }        /* Orange */
-        .card.Scholarship::before { background: #8b5cf6; } /* Purple */
-
-        .card-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px; }
-        .card h3 { margin: 0; font-size: 1.15rem; color: #1e293b; line-height: 1.4; }
-        .cat-badge { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; padding: 4px 8px; border-radius: 6px; letter-spacing: 0.5px; }
-        .cat-badge.Study { background: #eff6ff; color: #3b82f6; }
-        .cat-badge.Job { background: #ecfdf5; color: #10b981; }
-        .cat-badge.Exam { background: #fffbeb; color: #f59e0b; }
-        .cat-badge.Scholarship { background: #f5f3ff; color: #8b5cf6; }
-
-        .desc { font-size: 0.95rem; color: #475569; line-height: 1.6; margin-bottom: 20px; flex-grow: 1; }
-        
-        /* Stats Grid */
-        .meta { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.85rem; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #f1f5f9; }
-        .meta-item { display: flex; flex-direction: column; }
-        .meta-label { font-weight: 600; color: #64748b; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 2px; }
-        .meta-val { color: #0f172a; font-weight: 500; }
-
-        /* Flowchart */
-        #flowchart-view { background: white; padding: 40px; border-radius: 12px; min-height: 500px; display: none; overflow: auto; text-align: center; border: 1px solid #e2e8f0; }
-
-        #loading { text-align: center; color: #64748b; margin-top: 50px; font-size: 1.2rem; }
-        .no-results { grid-column: 1 / -1; text-align: center; padding: 40px; color: #64748b; background: white; border-radius: 12px; border: 2px dashed #e2e8f0; }
     </style>
 </head>
 <body>
@@ -91,211 +62,192 @@
 <div class="container">
     <header>
         <h1>🚀 Career Pathfinder</h1>
-        <p>Verified roadmap for 10th, 12th, MBBS, Engineering, and PhD students.</p>
+        <p>Verified roadmap. Click any card to see details and community insights.</p>
+        <button class="admin-btn" onclick="adminLogin()" title="Admin Edit"><i class="ph ph-lock-key"></i></button>
     </header>
 
     <div class="controls">
-        <div class="top-bar">
-            <div class="select-wrapper">
-                <label>I have completed</label>
-                <select id="stageSelect" onchange="refreshData()">
-                    <option value="all">Loading data...</option>
-                </select>
-            </div>
-            
-            <div class="search-box">
-                <label>Search (e.g., "Biology", "NASA", "Germany")</label>
-                <i class="ph ph-magnifying-glass"></i>
-                <input type="text" id="searchInput" placeholder="Type to filter..." onkeyup="refreshData()">
-            </div>
-        </div>
-
-        <div class="filters">
-            <div class="chip active" onclick="setFilter('all', this)"><i class="ph ph-squares-four"></i> All</div>
-            <div class="chip" onclick="setFilter('Study', this)"><i class="ph ph-graduation-cap"></i> Courses</div>
-            <div class="chip" onclick="setFilter('Job', this)"><i class="ph ph-briefcase"></i> Jobs</div>
-            <div class="chip" onclick="setFilter('Exam', this)"><i class="ph ph-pencil-simple"></i> Exams</div>
-            <div class="chip" onclick="setFilter('Scholarship', this)"><i class="ph ph-currency-inr"></i> Scholarships</div>
-        </div>
-
-        <div class="view-toggle">
-            <button class="toggle-btn active" onclick="setView('grid', this)"><i class="ph ph-grid-four"></i> Grid</button>
-            <button class="toggle-btn" onclick="setView('flowchart', this)"><i class="ph ph-tree-structure"></i> Flowchart</button>
-        </div>
+        <select id="stageSelect" onchange="renderGrid()"><option value="all">Loading...</option></select>
+        <input type="text" id="searchInput" placeholder="Search courses, exams, jobs..." onkeyup="renderGrid()">
     </div>
 
-    <div id="loading"><i class="ph ph-spinner ph-spin"></i> Loading database...</div>
-    <div id="grid-view" class="grid"></div>
-    <div id="flowchart-view" class="mermaid"></div>
+    <div id="grid-view" class="grid">Loading Database...</div>
 </div>
 
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <button class="close-btn" onclick="closeModal(true)"><i class="ph ph-x"></i></button>
+        <div id="modalContent">
+            </div>
+        
+        <div class="community-section">
+            <div class="community-header">
+                <h3>👥 Community Insights</h3>
+                <a href="#" id="contributeLink" target="_blank" class="btn-contribute">+ Add Your Experience</a>
+            </div>
+            <p style="font-size: 12px; color: #64748b; margin-top: -10px; margin-bottom: 15px;">Entries are reviewed by admins before appearing publicly.</p>
+            <div id="communityComments">
+                </div>
+        </div>
+    </div>
+</div>
+
+<a href="https://docs.google.com/forms/d/e/1FAIpQLSdILPhUbVozR5f-Gka-kDe1_Z9NiXzRiGq3aCJc99qqyb-iHQ/viewform?usp=dialog" target="_blank" class="fab">
+    <i class="ph ph-chat-teardrop-text"></i>
+    <span class="fab-tooltip">Site Feedback</span>
+</a>
+
 <script>
-    // ---------------------------------------------------------
-    // 
-    const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTS-7VnjzzDZDXXiSYTcpBQwov0_ErYcZHufwKgmDQf5-Bt1NK0qot1JvAbhigaHL6iots2aIM7cdI2/pub?output=csv';
-    // ---------------------------------------------------------
+    // ============================================================================
+    // 🔴 1. MAIN DATA: Your original CSV link
+    const MAIN_CSV_URL = 'YOUR_MAIN_SHEET_CSV_LINK';
+    
+    // 🔴 2. COMMUNITY DATA: The CSV link for the "Approved" tab
+    const APPROVED_COMMENTS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRTAmgpSCAOM7xBUoZd4HHvkivsJ0wM1qof-ujygb5vzrN1njB-hNO0kqy9yOgtBtStmSdf0_ch7cPp/pub?gid=351018171&single=true&output=csv';
+    
+    // 🔴 3. CONTRIBUTE FORM: The base URL of your detailed input Google form
+    const CONTRIBUTE_FORM_BASE_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdRRfNU_Fjn61zNgRZRvmyC18bY9GIo-d6e_zrxuVf3zX5c5g/viewform?usp=pp_url&entry.1250441864'; 
+    
+    // 🔴 4. ADMIN DETAILS
+    const ADMIN_EDIT_LINK = 'https://docs.google.com/spreadsheets/d/1rvU0Ci2fxTvPSy1dvO6tyh-R5-B_3CfYgyzjzDZsbQg/edit?resourcekey=&gid=351018171#gid=351018171'; // The standard drive.google link
+    const ADMIN_PIN = '1234'; // Change this to whatever you want
+    // ============================================================================
 
     let allData = [];
-    let currentFilter = 'all';
-    let currentView = 'grid';
-
-    mermaid.initialize({ startOnLoad: false, theme: 'base', themeVariables: { primaryColor: '#eff6ff', edgeLabelBackground:'#fff', tertiaryColor: '#fff' } });
+    let approvedComments = [];
 
     window.onload = function() {
-        Papa.parse(SHEET_CSV_URL, {
+        // Fetch Main Data
+        Papa.parse(MAIN_CSV_URL, {
             download: true, header: true, skipEmptyLines: true,
             complete: function(results) {
                 allData = results.data;
                 populateDropdown();
-                document.getElementById('loading').style.display = 'none';
+                renderGrid();
             }
+        });
+
+        // Fetch Approved Comments (We do this silently in the background)
+        Papa.parse(APPROVED_COMMENTS_CSV_URL, {
+            download: true, header: true, skipEmptyLines: true,
+            complete: function(results) {
+                approvedComments = results.data;
+            },
+            error: function() { console.log("No community data found yet or link missing."); }
         });
     };
 
     function populateDropdown() {
         const select = document.getElementById('stageSelect');
-        // Get unique stages and sort them
         const stages = [...new Set(allData.map(d => d.Current_Stage))].sort();
         select.innerHTML = '<option value="all">Select your qualification...</option>';
-        stages.forEach(s => {
-            if(s) select.innerHTML += `<option value="${s}">${s}</option>`;
-        });
+        stages.forEach(s => { if(s) select.innerHTML += `<option value="${s}">${s}</option>`; });
     }
 
-    function setFilter(filter, btn) {
-        currentFilter = filter;
-        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-        btn.classList.add('active');
-        refreshData();
-    }
-
-    function setView(view, btn) {
-        currentView = view;
-        document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById('grid-view').style.display = view === 'grid' ? 'grid' : 'none';
-        document.getElementById('flowchart-view').style.display = view === 'flowchart' ? 'block' : 'none';
-        refreshData();
-    }
-
-    function refreshData() {
+    function renderGrid() {
         const stage = document.getElementById('stageSelect').value;
-        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const search = document.getElementById('searchInput').value.toLowerCase();
         const container = document.getElementById('grid-view');
+        container.innerHTML = '';
 
-        if(stage === 'all') {
-            container.innerHTML = '<div class="no-results">Please select your current qualification stage from the dropdown above.</div>';
-            document.getElementById('flowchart-view').innerHTML = '';
-            return;
-        }
-
-        // Filter Logic
         const filtered = allData.filter(item => {
-            // 1. Stage Match
-            if (item.Current_Stage !== stage) return false;
-            
-            // 2. Category Match
-            if (currentFilter !== 'all' && !item.Category.includes(currentFilter)) return false;
-
-            // 3. Search Term Match
-            if (searchTerm) {
-                const searchStr = (item.Option_Name + item.Description + item.Admission_Exam).toLowerCase();
-                if (!searchStr.includes(searchTerm)) return false;
-            }
+            if (stage !== 'all' && item.Current_Stage !== stage) return false;
+            if (search && !(item.Option_Name + item.Description).toLowerCase().includes(search)) return false;
             return true;
         });
 
-        if (currentView === 'grid') renderGrid(filtered);
-        else renderFlowchart(stage, filtered);
-    }
+        if (filtered.length === 0) { container.innerHTML = '<p>No results found.</p>'; return; }
 
-    function renderGrid(data) {
-        const container = document.getElementById('grid-view');
-        container.innerHTML = '';
-        
-        if (data.length === 0) {
-            container.innerHTML = '<div class="no-results">No results found. Try changing filters or search terms.</div>'; 
-            return;
-        }
-
-        data.forEach(item => {
-            // Clean Category for CSS class
-            const catClass = item.Category.split(' ')[0];
-            
-            // Smart Logic: Hide irrelevant fields based on Category
-            const isJob = item.Category.includes('Job');
-            const isSchol = item.Category.includes('Scholarship');
-            const isExam = item.Category.includes('Exam');
-
-            let metaHtml = '';
-            
-            // 1. Duration (Hide for Jobs/Exams)
-            if(!isJob && !isExam && item.Duration) 
-                metaHtml += `<div class="meta-item"><span class="meta-label">Duration</span><span class="meta-val">${item.Duration}</span></div>`;
-            
-            // 2. Fees (Hide for Jobs/Scholarships)
-            if(!isJob && !isSchol && !isExam && item.Approx_Fees) 
-                metaHtml += `<div class="meta-item"><span class="meta-label">Approx Fees</span><span class="meta-val">${item.Approx_Fees}</span></div>`;
-            
-            // 3. Salary/Stipend (Show for Jobs and Scholarships)
-            if(item.Average_Salary) {
-                const label = isSchol ? 'Grant/Stipend' : 'Avg Salary';
-                metaHtml += `<div class="meta-item"><span class="meta-label">${label}</span><span class="meta-val">${item.Average_Salary}</span></div>`;
-            }
-
-            // 4. Exam (Show if exists)
-            if(item.Admission_Exam) 
-                metaHtml += `<div class="meta-item"><span class="meta-label">Entrance/Exam</span><span class="meta-val">${item.Admission_Exam}</span></div>`;
-
+        filtered.forEach((item, index) => {
             container.innerHTML += `
-                <div class="card ${catClass}">
-                    <div class="card-header">
-                        <h3>${item.Option_Name}</h3>
-                        <span class="cat-badge ${catClass}">${item.Category}</span>
+                <div class="card" onclick="openModal(${index})">
+                    <span class="tag">${item.Category}</span>
+                    <h3>${item.Option_Name}</h3>
+                    <p style="font-size: 0.9rem; color: #475569; margin:0;">${item.Description.substring(0, 80)}...</p>
+                    <div style="margin-top: 15px; font-size: 14px; color: var(--primary); font-weight: bold;">
+                        Read Details →
                     </div>
-                    <div class="desc">${item.Description}</div>
-                    <div class="meta">${metaHtml}</div>
                 </div>
             `;
         });
     }
 
-    async function renderFlowchart(root, data) {
-        const container = document.getElementById('flowchart-view');
-        container.innerHTML = ''; 
+    // Modal Logic
+    function openModal(index) {
+        const stage = document.getElementById('stageSelect').value;
+        const search = document.getElementById('searchInput').value.toLowerCase();
         
-        if(data.length === 0) { container.innerHTML = 'No data to chart.'; return; }
-
-        let graph = `graph TD\n`;
-        // Root Node Style
-        graph += `ROOT("${root}"):::rootNode\n`;
-        
-        data.forEach((item, index) => {
-            let id = `node${index}`;
-            // Remove special chars for Mermaid compatibility
-            let label = item.Option_Name.replace(/["()]/g, ''); 
-            let cat = item.Category.split(' ')[0];
-            graph += `ROOT --> ${id}["${label}"]:::${cat}\n`;
-            
-            // Optional: Click event logic could go here
+        // Find the exact item from the filtered list
+        const filtered = allData.filter(item => {
+            if (stage !== 'all' && item.Current_Stage !== stage) return false;
+            if (search && !(item.Option_Name + item.Description).toLowerCase().includes(search)) return false;
+            return true;
         });
+        
+        const item = filtered[index];
+        if(!item) return;
 
-        // Mermaid Styling
-        graph += `classDef rootNode fill:#1e293b,color:#fff,stroke:none,rx:5,ry:5,padding:15px;\n`;
-        graph += `classDef Study fill:#eff6ff,stroke:#3b82f6,color:#1e3a8a,rx:5,ry:5;\n`;
-        graph += `classDef Job fill:#ecfdf5,stroke:#10b981,color:#064e3b,rx:5,ry:5;\n`;
-        graph += `classDef Exam fill:#fffbeb,stroke:#f59e0b,color:#7c2d12,rx:5,ry:5;\n`;
-        graph += `classDef Scholarship fill:#f5f3ff,stroke:#8b5cf6,color:#5b21b6,rx:5,ry:5;\n`;
+        // 1. Fill Main Content
+        document.getElementById('modalContent').innerHTML = `
+            <span style="font-size:12px; color:#64748b; font-weight:bold;">${item.Current_Stage} > ${item.Category}</span>
+            <h2 style="margin: 5px 0 15px 0; color: #0f172a; font-size: 2rem;">${item.Option_Name}</h2>
+            <p style="font-size: 1.1rem; line-height: 1.6; color: #334155;">${item.Description}</p>
+            
+            <div class="modal-meta">
+                <div class="meta-item"><strong>⏳ Duration</strong> ${item.Duration || 'N/A'}</div>
+                <div class="meta-item"><strong>💸 Approx Fees</strong> ${item.Approx_Fees || 'N/A'}</div>
+                <div class="meta-item"><strong>💰 Salary/Stipend</strong> ${item.Average_Salary || 'N/A'}</div>
+                <div class="meta-item"><strong>📝 Admission/Exam</strong> ${item.Admission_Exam || 'N/A'}</div>
+            </div>
+        `;
 
-        try {
-            const { svg } = await mermaid.render('mermaidGraph', graph);
-            container.innerHTML = svg;
-        } catch(e) {
-            container.innerHTML = 'Error generating chart. Please try Grid View.';
-            console.error(e);
+        // 2. Set the link for the contribution form
+        // We append the Option_Name so users don't have to type it.
+        const encodedOption = encodeURIComponent(item.Option_Name);
+        document.getElementById('contributeLink').href = `${CONTRIBUTE_FORM_BASE_URL}?usp=pp_url&entry.1250441864=${encodedOption}`;
+
+        // 3. Load Approved Comments for this specific option
+        const commentsDiv = document.getElementById('communityComments');
+        commentsDiv.innerHTML = '';
+        
+        const relevantComments = approvedComments.filter(c => c.Option_Name === item.Option_Name);
+        
+        if(relevantComments.length === 0) {
+            commentsDiv.innerHTML = '<p style="color: #64748b; font-style: italic; font-size: 0.9rem;">No community insights yet. Be the first to share!</p>';
+        } else {
+            relevantComments.forEach(c => {
+                commentsDiv.innerHTML += `
+                    <div class="comment-card">
+                        <div class="comment-author">${c.Contributor_Name || 'Anonymous User'} 
+                            <span style="font-size:11px; color: #64748b; font-weight:normal;"> - ${c.Role || 'Student'}</span>
+                        </div>
+                        <div style="font-size: 0.95rem; color: #334155; line-height: 1.5;">${c.Experience_Advice}</div>
+                    </div>
+                `;
+            });
+        }
+
+        // Show Modal
+        document.getElementById('modalOverlay').classList.add('active');
+        document.body.style.overflow = 'hidden'; // prevent background scrolling
+    }
+
+    function closeModal(force = false) {
+        if (force || event.target.id === 'modalOverlay') {
+            document.getElementById('modalOverlay').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+    }
+
+    // Admin Login Logic
+    function adminLogin() {
+        const pin = prompt("Enter Admin PIN to edit database:");
+        if (pin === ADMIN_PIN) {
+            window.open(ADMIN_EDIT_LINK, '_blank');
+        } else if (pin !== null) {
+            alert("Incorrect PIN.");
         }
     }
 </script>
-
 </body>
 </html>

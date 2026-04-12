@@ -152,9 +152,33 @@
 
         const filtered = allData.filter(item => {
             if (stage !== 'all' && item.Current_Stage !== stage) return false;
-            if (search && !(item.Option_Name + item.Description).toLowerCase().includes(search)) return false;
+            // Bulletproof search check
+            const searchString = ((item.Option_Name || '') + (item.Description || '')).toLowerCase();
+            if (search && !searchString.includes(search)) return false;
             return true;
         });
+
+        if (filtered.length === 0) { 
+            container.innerHTML = '<p>No results found.</p>'; 
+            return; 
+        }
+
+        filtered.forEach((item, index) => {
+            // Bulletproof description length check
+            const shortDesc = (item.Description || '').substring(0, 80);
+            
+            container.innerHTML += `
+                <div class="card" onclick="openModal(${index})">
+                    <span class="tag">${item.Category || 'General'}</span>
+                    <h3>${item.Option_Name || 'Unknown Option'}</h3>
+                    <p style="font-size: 0.9rem; color: #475569; margin:0;">${shortDesc}...</p>
+                    <div style="margin-top: 15px; font-size: 14px; color: var(--primary); font-weight: bold;">
+                        Read Details →
+                    </div>
+                </div>
+            `;
+        });
+    }
 
         if (filtered.length === 0) { container.innerHTML = '<p>No results found.</p>'; return; }
 

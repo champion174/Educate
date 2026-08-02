@@ -312,17 +312,23 @@
             return;
         }
 
-        let nodesToRender = new Map(); 
-        let edges = [];
+        let validEdges = new Set();
+        let validNodes = new Map();
 
         targets.forEach(target => {
             let current = target;
             let currentId = sanitizeId(current.Option_Name);
-            nodesToRender.set(currentId, current);
+            
+            let pathNodes = new Map();
+            let pathEdges = [];
+            pathNodes.set(currentId, current);
 
             let safety = 0;
-            while(current && safety < 20) {
+            let reachedStart = false;
+            
+            while(current && safety < 50) {
                 if(startStage !== 'all' && current.Current_Stage === startStage) {
+                    reachedStart = true;
                     break;
                 }
 
@@ -333,8 +339,8 @@
                 
                 if (parent) {
                     let parentId = sanitizeId(parent.Option_Name);
-                    edges.push({from: parentId, to: currentId});
-                    nodesToRender.set(parentId, parent);
+                    pathEdges.push({from: parentId, to: currentId});
+                    pathNodes.set(parentId, parent);
                     
                     current = parent;
                     currentId = parentId;
@@ -343,7 +349,46 @@
                 }
                 safety++;
             }
+            
+            // SMART FILTER: Only save the path if it successfully connects to the starting stage
+            if (startStage === 'all' || reachedStart) {
+                pathNodes.forEach((node, id) => validNodes.set(id, node));
+                pathEdges.forEach(edge => validEdges.add(JSON.stringify(edge)));
+            }
         });
+
+        let finalNodes = validNodes;
+        let finalEdgesArray = Array.from(validEdges).map(e => JSON.parse(e));
+        let showMissingLinks = false;
+
+        // Fallback: If no paths reached the startStage, it means the chain is broken in the Google Sheet
+        // We render them anyway with "Missing Links" so the user can see where the connection failed.
+        if (startStage !== 'all' && finalNodes.size === 0) {
+            showMissingLinks = true;
+            targets.forEach(target => {
+                let current = target;
+                let currentId = sanitizeId(current.Option_Name);
+                finalNodes.set(currentId, current);
+
+                let safety = 0;
+                while(current && safety < 50) {
+                    let prereqName = (current.Prerequisite || '').trim().toLowerCase();
+                    if (!prereqName) break;
+                    let parent = allData.find(item => (item.Option_Name || '').trim().toLowerCase() === prereqName);
+                    if (parent) {
+                        let parentId = sanitizeId(parent.Option_Name);
+                        finalEdgesArray.push({from: parentId, to: currentId});
+                        finalNodes.set(parentId, parent);
+                        current = parent;
+                        currentId = parentId;
+                    } else break;
+                    safety++;
+                }
+            });
+            // Final deduplication for fallback
+            let uniqueEdges = new Set(finalEdgesArray.map(e => JSON.stringify(e)));
+            finalEdgesArray = Array.from(uniqueEdges).map(e => JSON.parse(e));
+        }
 
         let graph = `graph TD\n`;
         
@@ -351,26 +396,25 @@
             graph += `ROOT(["🎯 ${startStage} (You are here)"]):::rootNode\n`;
         }
 
-        nodesToRender.forEach((node, id) => {
+        finalNodes.forEach((node, id) => {
             let label = (node.Option_Name || 'Unknown').replace(/["()]/g, '');
             let cat = (node.Category || 'General').split(' ')[0];
             if(cat === 'Fellowship') cat = 'Scholarship';
             graph += `${id}["${label}"]:::${cat}\n`;
         });
 
-        let toNodes = new Set(edges.map(e => e.to));
+        let toNodes = new Set(finalEdgesArray.map(e => e.to));
         
-        edges.forEach(edge => {
+        finalEdgesArray.forEach(edge => {
             graph += `${edge.from} --> ${edge.to}\n`;
         });
 
-        // The Smart Debugger Logic
         if (startStage !== 'all') {
-            nodesToRender.forEach((node, id) => {
+            finalNodes.forEach((node, id) => {
                 if (!toNodes.has(id)) {
                     if(node.Current_Stage === startStage) {
                         graph += `ROOT --> ${id}\n`;
-                    } else {
+                    } else if (showMissingLinks) {
                         graph += `ROOT -. "⚠️ Missing Link in Sheet" .-> ${id}\n`;
                     }
                 }

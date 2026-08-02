@@ -33,7 +33,6 @@
         .admin-btn { position: absolute; top: 0; right: 0; background: none; border: none; font-size: 24px; cursor: pointer; color: #cbd5e1; transition: color 0.2s; }
         .admin-btn:hover { color: var(--primary); }
 
-        /* Controls */
         .controls { background: var(--card); padding: 30px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); margin-bottom: 40px; border: 1px solid rgba(226, 232, 240, 0.8); animation: fadeIn 0.8s ease-out; }
         .top-bar { display: flex; gap: 20px; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 25px; }
         
@@ -54,26 +53,10 @@
         .toggle-btn:hover { color: var(--text-main); }
         .toggle-btn.active { color: var(--primary); border-bottom: 3px solid var(--primary); padding-bottom: 5px; }
 
-        /* Grid & Animated Cards with Colored Borders */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px; }
-        .card { 
-            background: var(--card); 
-            border-radius: 16px; 
-            padding: 28px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02); 
-            border: 2px solid var(--border); 
-            cursor: pointer; 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-            position: relative; 
-            display: flex; 
-            flex-direction: column; 
-            opacity: 0;
-            transform: translateY(20px);
-            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
+        .card { background: var(--card); border-radius: 16px; padding: 28px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 2px solid var(--border); cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; display: flex; flex-direction: column; opacity: 0; transform: translateY(20px); animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         .card:hover { transform: translateY(-6px); box-shadow: 0 15px 30px -10px rgba(0,0,0,0.1); }
         
-        /* Dynamic Category Borders */
         .card.Study { border-color: var(--color-study); }
         .card.Job { border-color: var(--color-job); }
         .card.Exam { border-color: var(--color-exam); }
@@ -87,23 +70,15 @@
 
         .card h3 { margin: 0 0 12px 0; font-size: 1.35rem; font-weight: 800; color: var(--text-main); line-height: 1.3; }
         .desc { font-size: 0.95rem; color: var(--text-muted); margin:0; flex-grow: 1; line-height: 1.6; }
-        
-        /* Card Stage Indicator (Useful for Path Searching) */
         .stage-indicator { position: absolute; top: 20px; right: 20px; font-size: 0.7rem; font-weight: 700; color: #94a3b8; background: #f1f5f9; padding: 4px 8px; border-radius: 20px; }
-
         .read-more { margin-top: 20px; font-size: 0.9rem; color: var(--primary); font-weight: 700; display: flex; align-items: center; gap: 4px; transition: gap 0.2s; }
         .card:hover .read-more { gap: 8px; }
 
-        /* Path Mode Banner */
         .path-banner { grid-column: 1 / -1; background: #eff6ff; color: #1e3a8a; padding: 15px 20px; border-radius: 12px; font-weight: 600; display: flex; align-items: center; gap: 10px; border: 1px solid #bfdbfe; animation: fadeIn 0.4s; }
-
-        /* Flowchart View */
         #flowchart-view { background: var(--card); padding: 40px; border-radius: 16px; min-height: 500px; display: none; overflow: auto; text-align: center; border: 2px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.04); }
 
-        /* Modal */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; box-sizing: border-box; backdrop-filter: blur(6px); }
         .modal-overlay.active { display: flex; animation: fadeIn 0.2s ease-out; }
-        
         .modal-content { background: var(--card); width: 100%; max-width: 750px; max-height: 90vh; border-radius: 24px; padding: 40px; overflow-y: auto; position: relative; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.3); transform: scale(0.95); opacity: 0; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .modal-overlay.active .modal-content { transform: scale(1); opacity: 1; }
         
@@ -122,7 +97,6 @@
         .meta-item strong { font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 6px; }
         .meta-item span { font-weight: 600; color: var(--text-main); font-size: 1.05rem; }
 
-        /* Community Section */
         .community-section { padding-top: 30px; border-top: 2px dashed #cbd5e1; }
         .community-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .community-header h3 { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 1.4rem; font-weight: 800; }
@@ -133,14 +107,12 @@
         .comment-author { font-weight: 800; font-size: 1rem; color: var(--text-main); margin-bottom: 8px; }
         .comment-author span { font-weight: 500; color: var(--text-muted); font-size: 0.85rem; }
 
-        /* Animations */
         @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes popIn { to { opacity: 1; transform: translateY(0); } }
 
         .fab { position: fixed; bottom: 30px; right: 30px; background: var(--text-main); color: white; width: 64px; height: 64px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 28px; box-shadow: 0 10px 25px rgba(0,0,0,0.25); cursor: pointer; text-decoration: none; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 900; }
         .fab:hover { transform: scale(1.1) rotate(5deg); background: var(--primary); }
-
         #loading { text-align: center; color: var(--text-muted); margin-top: 50px; font-size: 1.2rem; display: flex; justify-content: center; align-items: center; gap: 10px; font-weight: 600; }
         .no-results { grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text-muted); background: var(--card); border-radius: 16px; border: 2px dashed #cbd5e1; font-size: 1.1rem; font-weight: 500; }
     </style>
@@ -177,7 +149,7 @@
 
         <div class="view-toggle">
             <button class="toggle-btn active" onclick="setView('grid', this)"><i class="ph ph-grid-four"></i> Grid View</button>
-            <button class="toggle-btn" onclick="setView('flowchart', this)"><i class="ph ph-tree-structure"></i> Flowchart View</button>
+            <button class="toggle-btn" onclick="setView('flowchart', this, false)"><i class="ph ph-tree-structure"></i> Flowchart View</button>
         </div>
     </div>
 
@@ -207,12 +179,10 @@
 </a>
 
 <script>
-    // ============================================================================
     const MAIN_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTS-7VnjzzDZDXXiSYTcpBQwov0_ErYcZHufwKgmDQf5-Bt1NK0qot1JvAbhigaHL6iots2aIM7cdI2/pub?gid=0&single=true&output=csv';
     const APPROVED_COMMENTS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRTAmgpSCAOM7xBUoZd4HHvkivsJ0wM1qof-ujygb5vzrN1njB-hNO0kqy9yOgtBtStmSdf0_ch7cPp/pub?gid=351018171&single=true&output=csv';
     const ADMIN_EDIT_LINK = 'https://docs.google.com/spreadsheets/d/1rvU0Ci2fxTvPSy1dvO6tyh-R5-B_3CfYgyzjzDZsbQg/edit?resourcekey=&gid=351018171#gid=351018171'; 
     const ADMIN_PIN = '1234'; 
-    // ============================================================================
 
     let allData = [];
     let currentFilteredData = [];
@@ -254,13 +224,14 @@
         refreshData();
     }
 
-    function setView(view, btn) {
+    // Pass 'true' to skipRefresh when called programmatically to avoid infinite loops
+    function setView(view, btn, skipRefresh = false) {
         currentView = view;
         document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+        if(btn) btn.classList.add('active');
         document.getElementById('grid-view').style.display = view === 'grid' ? 'grid' : 'none';
         document.getElementById('flowchart-view').style.display = view === 'flowchart' ? 'block' : 'none';
-        refreshData();
+        if(!skipRefresh) refreshData();
     }
 
     function refreshData() {
@@ -276,27 +247,30 @@
             return;
         }
 
-        currentFilteredData = allData.filter(item => {
-            // Path Search Logic: If searching globally, ignore the dropdown constraint to show the full roadmap
-            if (!isGlobalSearch && item.Current_Stage !== stage) return false;
-            
-            const cat = (item.Category || '');
-            if (currentFilter === 'Scholarship') {
-                if (!(cat.includes('Scholarship') || cat.includes('Fellowship'))) return false;
-            } else if (currentFilter !== 'all' && !cat.includes(currentFilter)) {
-                return false;
-            }
-            
-            if (isGlobalSearch) {
-                const searchStr = ((item.Option_Name || '') + (item.Description || '') + (item.Admission_Exam || '') + (item.Current_Stage || '')).toLowerCase();
-                if (!searchStr.includes(search)) return false;
-            }
-            
-            return true;
-        });
+        // Auto-Switch to Flowchart Mode when searching for a path
+        if (isGlobalSearch && currentView !== 'flowchart') {
+            setView('flowchart', document.querySelectorAll('.toggle-btn')[1], true);
+        }
 
-        if (currentView === 'grid') renderGrid(currentFilteredData, isGlobalSearch);
-        else renderFlowchart(isGlobalSearch ? 'Global Search' : stage, currentFilteredData);
+        if (currentView === 'grid') {
+            // Standard Grid Filtering
+            currentFilteredData = allData.filter(item => {
+                if (item.Current_Stage !== stage) return false;
+                
+                const cat = (item.Category || '');
+                if (currentFilter === 'Scholarship') {
+                    if (!(cat.includes('Scholarship') || cat.includes('Fellowship'))) return false;
+                } else if (currentFilter !== 'all' && !cat.includes(currentFilter)) {
+                    return false;
+                }
+                return true;
+            });
+            renderGrid(currentFilteredData, false);
+            
+        } else {
+            // Pathfinding Flowchart Rendering
+            buildAndRenderPath(stage, search, currentFilter);
+        }
     }
 
     function renderGrid(data, isGlobalSearch) {
@@ -308,20 +282,14 @@
             return;
         }
 
-        if (isGlobalSearch) {
-            container.innerHTML += `<div class="path-banner"><i class="ph-fill ph-map-pin-line" style="font-size:20px;"></i> Path Search Active: Showing all stages leading to your search goal.</div>`;
-        }
-
         data.forEach((item, index) => {
             const catClass = (item.Category || 'General').split(' ')[0];
             const badgeText = item.Category || 'General';
             const shortDesc = (item.Description || '').substring(0, 90);
-            
-            // Staggered animation delay
             const delay = index * 0.05;
 
             container.innerHTML += `
-                <div class="card ${catClass}" style="animation-delay: ${delay}s" onclick="openModal(${index})">
+                <div class="card ${catClass}" style="animation-delay: ${delay}s" onclick="openModal('${encodeURIComponent(JSON.stringify(item))}')">
                     <div class="stage-indicator">${item.Current_Stage || ''}</div>
                     <span class="cat-badge">${badgeText}</span>
                     <h3>${item.Option_Name || 'Unknown Option'}</h3>
@@ -332,21 +300,93 @@
         });
     }
 
-    async function renderFlowchart(root, data) {
+    // New Pathfinding Algorithm
+    async function buildAndRenderPath(startStage, searchStr, catFilter) {
         const container = document.getElementById('flowchart-view');
-        container.innerHTML = ''; 
-        if(data.length === 0) { container.innerHTML = 'No data to chart.'; return; }
+        
+        let targets = allData;
+
+        // If searching, find target nodes. Otherwise, use all nodes for the current stage.
+        if (searchStr) {
+            targets = allData.filter(item => {
+                const str = ((item.Option_Name || '') + (item.Description || '')).toLowerCase();
+                return str.includes(searchStr);
+            });
+        } else {
+            targets = allData.filter(item => item.Current_Stage === startStage);
+        }
+
+        if(targets.length === 0) {
+            container.innerHTML = '<div class="no-results">No path found for this search.</div>';
+            return;
+        }
+
+        let nodesToRender = new Map(); 
+        let edges = [];
+
+        // Backtrack from targets to starting stage using 'Prerequisite'
+        targets.forEach(target => {
+            let current = target;
+            let currentId = sanitizeId(current.Option_Name);
+            nodesToRender.set(currentId, current);
+
+            let safety = 0;
+            while(current && safety < 15) {
+                if(startStage !== 'all' && current.Current_Stage === startStage) break;
+
+                let prereqName = (current.Prerequisite || '').trim().toLowerCase();
+                let parent = allData.find(item => (item.Option_Name || '').trim().toLowerCase() === prereqName);
+                
+                if (parent) {
+                    let parentId = sanitizeId(parent.Option_Name);
+                    edges.push({from: parentId, to: currentId});
+                    nodesToRender.set(parentId, parent);
+                    
+                    current = parent;
+                    currentId = parentId;
+                } else {
+                    break; // End of chain
+                }
+                safety++;
+            }
+        });
 
         let graph = `graph TD\n`;
-        graph += `ROOT("${root}"):::rootNode\n`;
         
-        data.forEach((item, index) => {
-            let id = `node${index}`;
-            let label = (item.Option_Name || 'Unknown').replace(/["()]/g, ''); 
-            let cat = (item.Category || 'General').split(' ')[0];
-            if(cat === 'Fellowship') cat = 'Scholarship'; 
-            graph += `ROOT --> ${id}["${label}"]:::${cat}\n`;
+        if (startStage !== 'all') {
+            graph += `ROOT("${startStage}"):::rootNode\n`;
+        }
+
+        // Draw Nodes
+        nodesToRender.forEach((node, id) => {
+            let label = (node.Option_Name || 'Unknown').replace(/["()]/g, '');
+            let cat = (node.Category || 'General').split(' ')[0];
+            if(cat === 'Fellowship') cat = 'Scholarship';
+            graph += `${id}["${label}"]:::${cat}\n`;
         });
+
+        // Draw Edges
+        let rootConnected = false;
+        edges.forEach(edge => {
+            graph += `${edge.from} --> ${edge.to}\n`;
+        });
+
+        // Connect ROOT to base nodes
+        if (startStage !== 'all') {
+            nodesToRender.forEach((node, id) => {
+                if(node.Current_Stage === startStage) {
+                    graph += `ROOT --> ${id}\n`;
+                    rootConnected = true;
+                }
+            });
+
+            // Fallback if user hasn't setup Prerequisites yet
+            if(!rootConnected && edges.length === 0) {
+                 nodesToRender.forEach((node, id) => {
+                     graph += `ROOT -. "Prerequisites not linked" .-> ${id}\n`;
+                 });
+            }
+        }
 
         graph += `classDef rootNode fill:#1e293b,color:#fff,stroke:none,rx:8,ry:8,padding:15px;\n`;
         graph += `classDef Study fill:#eff6ff,stroke:#3b82f6,color:#1e3a8a,rx:8,ry:8;\n`;
@@ -355,16 +395,21 @@
         graph += `classDef Scholarship fill:#f5f3ff,stroke:#8b5cf6,color:#5b21b6,rx:8,ry:8;\n`;
 
         try {
-            const { svg } = await mermaid.render('mermaidGraph', graph);
+            const graphId = 'graph_' + Date.now();
+            const { svg } = await mermaid.render(graphId, graph);
             container.innerHTML = svg;
         } catch(e) {
-            container.innerHTML = 'Error generating chart. Please switch to Grid View.';
+            container.innerHTML = '<div class="no-results">Error generating path. Ensure the <b>Prerequisite</b> column in your Google Sheet is filled out correctly.</div>';
         }
     }
 
-    function openModal(index) {
-        const item = currentFilteredData[index];
-        if(!item) return;
+    function sanitizeId(str) {
+        return 'node_' + (str || 'unknown').replace(/[^a-zA-Z0-9]/g, '');
+    }
+
+    // Modal data parsing
+    function openModal(encodedItem) {
+        const item = JSON.parse(decodeURIComponent(encodedItem));
 
         let linkHtml = '';
         if (item.Link && item.Link.trim() !== '') {
@@ -405,7 +450,7 @@
         const commentsDiv = document.getElementById('communityComments');
         commentsDiv.innerHTML = '';
         
-        // BUG FIX: Added strict trimming and lowercase checks to map comments properly
+        // BUG FIX: Strict trimming for accurate community insights mapping
         const relevantComments = approvedComments.filter(c => {
             const cName = (c.Option_Name || '').trim().toLowerCase();
             const iName = (item.Option_Name || '').trim().toLowerCase();

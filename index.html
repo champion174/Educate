@@ -114,6 +114,34 @@
         .fab:hover { transform: scale(1.1) rotate(5deg); background: var(--primary); }
         #loading { text-align: center; color: var(--text-muted); margin-top: 50px; font-size: 1.2rem; display: flex; justify-content: center; align-items: center; gap: 10px; font-weight: 600; }
         .no-results { grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text-muted); background: var(--card); border-radius: 16px; border: 2px dashed #cbd5e1; font-size: 1.1rem; font-weight: 500; }
+        .comment-text {
+    font-size: 0.95rem; 
+    color: #334155; 
+    line-height: 1.6;
+    white-space: pre-wrap; /* This forces the browser to keep paragraphs/line breaks! */
+}
+
+.comment-text.collapsed {
+    display: -webkit-box;
+    -webkit-line-clamp: 4; /* Shows only 4 lines of text */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.read-more-btn {
+    background: none; 
+    border: none; 
+    color: var(--primary);
+    font-weight: 700; 
+    cursor: pointer; 
+    padding: 0; 
+    margin-top: 10px; 
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.read-more-btn:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -491,16 +519,19 @@
         if(relevantComments.length === 0) {
             commentsDiv.innerHTML = '<p style="color: var(--text-muted); font-style: italic; font-size: 0.95rem;">No community insights yet. Be the first to share!</p>';
         } else {
-            relevantComments.forEach(c => {
-                commentsDiv.innerHTML += `
-                    <div class="comment-card">
-                        <div class="comment-author">${c.Contributor_Name || 'Anonymous User'} 
-                            <span>- ${c.Role || 'Student'}</span>
-                        </div>
-                        <div style="font-size: 0.95rem; color: #334155; line-height: 1.6;">${c.Experience_Advice}</div>
-                    </div>
-                `;
-            });
+            relevantComments.forEach((c, i) => {
+    commentsDiv.innerHTML += `
+        <div class="comment-card">
+            <div class="comment-author">${c.Contributor_Name || 'Anonymous User'} 
+                <span>- ${c.Role || 'Student'}</span>
+            </div>
+            <div class="comment-text collapsed" id="comment-text-${i}">${c.Experience_Advice}</div>
+            <button class="read-more-btn" onclick="toggleComment('comment-text-${i}', this)">
+                Read More <i class="ph-bold ph-caret-down"></i>
+            </button>
+        </div>
+    `;
+});
         }
 
         document.getElementById('modalOverlay').classList.add('active');
@@ -522,6 +553,16 @@
             alert("Incorrect PIN.");
         }
     }
+    function toggleComment(id, btn) {
+    const textEl = document.getElementById(id);
+    if (textEl.classList.contains('collapsed')) {
+        textEl.classList.remove('collapsed');
+        btn.innerHTML = 'Read Less <i class="ph-bold ph-caret-up"></i>';
+    } else {
+        textEl.classList.add('collapsed');
+        btn.innerHTML = 'Read More <i class="ph-bold ph-caret-down"></i>';
+    }
+}
 </script>
 </body>
 </html>
